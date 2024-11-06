@@ -5,13 +5,23 @@
         "role": "Admin"
     },
     {
+        "username": "Richo",
+        "password": "062",
+        "role": "Admin"
+    },
+    {
+        "username": "Hermawan",
+        "password": "060",
+        "role": "Admin"
+    },
+    {
         "username": "User",
         "password": "000",
         "role": "User"
     },
     {
-        "username": "X",
+        "username": "Moderator",
         "password": "111",
-        "role": "Mod"
+        "role": "Moderator"
     }
 ]
