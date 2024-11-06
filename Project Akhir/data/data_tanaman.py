@@ -1,9 +1,7 @@
-import json
+from data_utility import *
 
-def load_data():
-    with open("Project Akhir\data\data_tanaman.json", "r") as file_json:
-        return json.load(file_json)
+def load_data_tanaman():
+    load_data("data_tanaman.json")
 
-def simpan_data(databaru):
-    with open("Project Akhir\data\data_tanaman.json", "w") as file_json:
-        json.dump(databaru, file_json, indent=4)
+def simpan_data_tanaman(databaru):
+    simpan_data(databaru, "data_tanaman.json")

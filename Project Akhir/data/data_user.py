@@ -1,25 +1,24 @@
-from utility import *
+from data_utility import *
 
-def load_data():
-    with open("Project Akhir\data\data_user.json", "r") as file_json:
-        return json.load(file_json)
+def load_data_user():
+    return load_data("data_user.json")
 
-def simpan_data(databaru):
-    with open("Project Akhir\data\data_user.json", "w") as file_json:
-        json.dump(databaru, file_json, indent=4)
+def simpan_data_tanaman(databaru):
+    simpan_data(databaru, "data_user.json")
 
 def login(username, password):
-    users = load_data()
+    users = load_data_user()
     for user in users:
         if user['username'] == username and user['password'] == password:
             return user
     return False
 
 def register(username, password):
-    users = load_data()
+    users = load_data_user()
     users.append({
         "username" : username,
         "password" : password,
         "role" : "user"
     })
-    simpan_data(users)
+    simpan_data_tanaman(users)
+    
