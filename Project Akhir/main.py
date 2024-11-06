@@ -6,6 +6,21 @@ users = [
 
 data_tanaman = [
     {"Nama": "Bunga Kamboja", "Jenis": "Bonsai Bunga", "Jadwal_siram": "3 Hari Sekali"},
+    {"Nama": "Sirih Gading", "Jenis": "Tropis Merambat", "Jadwal_siram": "4 Hari Sekali"},
+    {"Nama": "Lidah Buaya", "Jenis": "Sukulen", "Jadwal_siram": "Seminggu Sekali"},
+    {"Nama": "Lidah Mertua", "Jenis": "Sukulen", "Jadwal_siram": "Seminggu Sekali"},
+    {"Nama": "Suplir", "Jenis": "Tanaman Paku", "Jadwal_siram": "Setiap Hari"},
+    {"Nama": "Sri Rejeki", "Jenis": "Tropis", "Jadwal_siram": "Seminggu Tiga Kali"},
+    {"Nama": "Daun Puring", "Jenis": "Hias Berdaun Warna", "Jadwal_siram": "Seminggu Tiga Kali"},
+    {"Nama": "Lili Paris", "Jenis": "Semi-Sukulen", "Jadwal_siram": "Seminggu Dua Kali"},
+    {"Nama": "Pucuk Merah", "Jenis": "Tanaman Semak", "Jadwal_siram": "Seminggu Tiga Kali"},
+    {"Nama": "Kuping Gajah", "Jenis": "Tropis Berdaun Besar", "Jadwal_siram": "Seminggu Dua Kali"},
+    {"Nama": "Monstera", "Jenis": "Tanaman Tropis", "Jadwal_siram": "Seminggu Dua Kali"},
+    {"Nama": "Calathea", "Jenis": "Tanaman Tropis", "Jadwal_siram": "Seminggu Tiga Kali"},
+    {"Nama": "Begonia", "Jenis": "Tanaman Hias Berbunga", "Jadwal_siram": "Seminggu Dua Kali"},
+    {"Nama": "Kadaka", "Jenis": "Tanaman Paku", "Jadwal_siram": "Seminggu Dua Kali"},
+    {"Nama": "Daun Dollar", "Jenis": "Sukulen", "Jadwal_siram": "Seminggu Sekali"},
+    {"Nama": "Aglaonema", "Jenis": "Tropis", "Jadwal_siram": "Seminggu Dua Kali"}
 ]
 
 
