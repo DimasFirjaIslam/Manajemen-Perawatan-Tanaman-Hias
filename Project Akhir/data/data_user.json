@@ -23,5 +23,15 @@
         "username": "Moderator",
         "password": "111",
         "role": "Moderator"
+    },
+    {
+        "username": "tes",
+        "password": "tes",
+        "role": "user"
+    },
+    {
+        "username": "tes2",
+        "password": "tes2",
+        "role": "tes"
     }
 ]
