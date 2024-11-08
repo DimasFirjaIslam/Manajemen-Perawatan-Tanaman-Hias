@@ -2,27 +2,27 @@
     {
         "username": "Dimas",
         "password": "057",
-        "role": "Admin"
+        "role": "admin"
     },
     {
         "username": "Richo",
         "password": "062",
-        "role": "Admin"
+        "role": "admin"
     },
     {
-        "username": "Hermawan",
+        "username": "MTHermawan",
         "password": "060",
-        "role": "Admin"
+        "role": "admin"
     },
     {
-        "username": "User",
-        "password": "000",
-        "role": "User"
+        "username": "user",
+        "password": "user",
+        "role": "user"
     },
     {
-        "username": "Moderator",
-        "password": "111",
-        "role": "Moderator"
+        "username": "mod",
+        "password": "mod",
+        "role": "moderator"
     },
     {
         "username": "tes",

@@ -15,41 +15,54 @@ def tambah_tanaman():
     media_tanam = input("Masukkan media tanam: ")
 
     databaru = {
-        "Nama": nama,
-        "Jenis": jenis,
-        "Jadwal_siram": jadwal_siram,
-        "Suhu": suhu,
-        "Pemupukan": pemupukan,
-        "Media_Tanam": media_tanam
+        "nama": nama,
+        "jenis": jenis,
+        "jadwal_siram": jadwal_siram,
+        "suhu": suhu,
+        "pemupukan": pemupukan,
+        "media_tanam": media_tanam
     }
 
     data = load_data_tanaman()
     data.append(databaru)
     simpan_data_tanaman(data)
-    print("Data berhasil ditambahkan!")
+    input("Data berhasil ditambahkan...!")
 
 def edit_tanaman():
-    data = load_data_tanaman()
-    nomor_tanaman = int(input("Masukkan nomor tanaman yang ingin diubah: ")) - 1
-    if 0 <= nomor_tanaman < len(data):
-        tanaman = data[nomor_tanaman]
-        tanaman["Nama"] = input("Masukkan nama tanaman baru: ")
-        tanaman["Jenis"] = input("Masukkan jenis tanaman baru: ")
-        tanaman["Jadwal_siram"] = input("Masukkan jadwal siram baru: ")
-        tanaman["Suhu"] = input("Masukkan suhu baru: ")
-        tanaman["Pemupukan"] = input("Masukkan jadwal pemupukan baru: ")
-        tanaman["Media_Tanam"] = input("Masukkan media tanam baru: ")
-        simpan_data_tanaman(data)
-        print("Data berhasil diubah!")
-    else:
-        print("Nomor tanaman tidak valid.")
+    try:
+        data = load_data_tanaman()
+        print("(Ket: Kosongkan input untuk kembali ke menu.)")
+        nomor_tanaman = input("Masukkan nomor tanaman yang ingin diubah: ")
+        if not nomor_tanaman: return
+        nomor_tanaman = int(nomor_tanaman) - 1
+        if 0 <= nomor_tanaman < len(data):
+            print("(Ket: Kosongkan input untuk mempertahankan nilai saat ini.)")
+            tanaman = data[nomor_tanaman]
+            tanaman["nama"] = input(f"Masukkan nama tanaman baru: ") or tanaman["nama"]
+            tanaman["jenis"] = input(f"Masukkan jenis tanaman baru: ") or tanaman["jenis"]
+            tanaman["jadwal_siram"] = input(f"Masukkan jadwal siram baru: ") or tanaman["jadwal_siram"]
+            tanaman["suhu"] = input(f"Masukkan suhu baru: ") or tanaman["suhu"]
+            tanaman["pemupukan"] = input(f"Masukkan jadwal pemupukan baru: ") or tanaman["pemupukan"]
+            tanaman["media_tanam"] = input(f"Masukkan media tanam baru: ") or tanaman["media_tanam"]
+            simpan_data_tanaman(data)
+            input("Data berhasil diubah...!")
+        else:
+            input("Tanaman tidak ditemukan...!")
+    except ValueError:
+        input("Nomor tanaman tidak valid, silakan coba lagi...")
 
 def hapus_tanaman():
-    nomor_tanaman = int(input("Masukkan nomor tanaman yang ingin dihapus: ")) - 1
-    data = load_data_tanaman()
-    if 0 <= nomor_tanaman < len(data):
-        data.pop(nomor_tanaman)
-        simpan_data_tanaman(data)
-        print("Data berhasil dihapus!")
-    else:
-        print("Data tanaman tidak ditemukan.")
+    try:
+        data = load_data_tanaman()
+        print("(Ket: Kosongkan input untuk kembali ke menu.)")
+        nomor_tanaman = input("Masukkan nomor tanaman yang ingin dihapus: ")
+        if not nomor_tanaman: return
+        nomor_tanaman = int(nomor_tanaman) - 1
+        if 0 <= nomor_tanaman < len(data):
+            data.pop(nomor_tanaman)
+            simpan_data_tanaman(data)
+            input("Data berhasil dihapus...!")
+        else:
+            input("Tanaman tidak ditemukan...!")
+    except ValueError:
+        input("Nomor tanaman tidak valid, silakan coba lagi...")

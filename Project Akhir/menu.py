@@ -1,8 +1,6 @@
-import os
-from utility import clear_screen
+from utility import *
 import data.data_user as data_user
 import data.data_tanaman as data_tanaman
-import main
 
 # Keterangan: Hanya gunakan variabel pilihan untuk pilihan menu
 username = ""
@@ -19,23 +17,117 @@ def logout():
     riwayatHalaman.clear()
     halaman = ""
 
+def menu_register():
+    clear_screen()
+    try:
+        judul_halaman("Registrasi")
+        print("(Ket: Kosongkan input untuk kembali.)")
+        username_baru = input_string("Username: ")
+        if not username_baru: return
+        elif any(user["username"] == username_baru for user in data_user.load_data_user()):
+            raise ValueError("Username sudah terdaftar!")
+        password_baru = input("Password: ")
+        if not password_baru: return
+
+        data_user.register(username_baru, password_baru)
+        print()
+        input("Registrasi Berhasil...!")
+    except ValueError as e:
+        print()
+        input(e)
+        menu_register()
+
+def menu_awal():
+    clear_screen()
+    global halaman, pilihan_menu, username
+
+    judul_halaman("Menu Awal")
+    print("1 > Registrasi")
+    print("2 > Log in")
+    print()
+    print("N > Keluar Program")
+    separator()
+
+    pilihan_menu = input("Pilih Menu >> ").lower()
+    if pilihan_menu == "1":
+        menu_register()
+    elif pilihan_menu == "2":
+        clear_screen()
+        judul_halaman("Log in")
+        input_username = input("Username: ")
+        if not input_username: return
+        input_password = input("Password: ")
+        if not input_password: return
+        user_login_data = data_user.login(input_username, input_password)
+
+        if user_login_data:
+            print()
+            input(f"Berhasil Login...!")
+            username = user_login_data['username']
+            halaman = "menu_utama"
+            if user_login_data['role'].lower() == data_user.level[0]:
+                menu_admin()
+            else:
+                menu_user()
+        else:
+            print()
+            input("Username atau password salah...!")
+    elif pilihan_menu != "n":
+        print()
+        input("Pilihan tidak valid, silakan coba lagi...")
+
+def menu_admin():
+    while logged_in():
+        setup_halaman()
+
+        if halaman == "menu_utama":
+            menu_utama()
+        elif halaman == "manajemen_tanaman":
+            manajemen_tanaman()
+        elif halaman == "manajemen_user":
+            manajemen_user()
+        elif halaman == "pengaturan":
+            menu_pengaturan()
+
+def menu_moderator():
+    while logged_in():
+        setup_halaman()
+
+        if halaman == "menu_utama":
+            menu_utama()
+        elif halaman == "manajemen_tanaman":
+            manajemen_tanaman()
+        elif halaman == "pengaturan":
+            menu_pengaturan()
+
+def menu_user():
+    while logged_in():
+        setup_halaman()
+
+        if halaman == "menu_utama":
+            menu_utama()
+        elif halaman == "manajemen_tanaman":
+            manajemen_tanaman()
+        elif halaman == "pengaturan":
+            menu_pengaturan()
+
 def tampilkan_tanaman():
     data = data_tanaman.load_data_tanaman()
     if data:
         for index, item in enumerate(data, start=1):
             print(f"""{index}.
-            Nama         : {item['Nama']}
-            Jenis        : {item['Jenis']}
-            Jadwal Siram : {item['Jadwal_siram']}
-            Suhu         : {item['Suhu']}
-            Pemupukan    : {item['Pemupukan']}
-            Media Tanam  : {item['Media_Tanam']}
+            Nama         : {item['nama']}
+            Jenis        : {item['jenis']}
+            Jadwal Siram : {item['jadwal_siram']}
+            Suhu         : {item['suhu']}
+            Pemupukan    : {item['pemupukan']}
+            Media Tanam  : {item['media_tanam']}
             """)
     else:
         print("Tidak ada data yang tersedia.")
 
-def tampilkan_user():
-    data = data_user.load_data_user()
+def tampilkan_user(roles = []):
+    data = data_user.load_data_user(roles)
     if data:
         for index, item in enumerate(data, start=1):
             print(f"""{index}.
@@ -45,49 +137,6 @@ def tampilkan_user():
     else:
         print("Tidak ada data yang tersedia.")
 
-def menu_awal():
-    clear_screen()
-    global halaman, pilihan_menu, username
-
-    print("=" * 10 + " Menu Awal " + "=" * 10)
-    print("1. Registrasi")
-    print("2. Log in")
-    
-    print("N. Keluar Program")
-
-    pilihan_menu = input("Masukkan Angka Menu Pilihan: ").lower()
-    if pilihan_menu == "1":
-        print("=" * 10 + " Registrasi " + "=" * 10)
-        username_baru = input("Masukkan Username Baru: ")
-        password_baru = input("Masukkan Password Baru: ")
-        user_exists = any(user["username"] == username_baru for user in data_user.load_data_user())
-
-        if user_exists:
-            input("Username Sudah Terdaftar")
-        else:
-            data_user.register(username_baru, password_baru)
-            print("Registrasi Berhasil")
-
-    elif pilihan_menu == "2":
-        input_username = input("Username: ")
-        input_password = input("Password: ")
-        user_login_data = data_user.login(input_username, input_password)
-
-        if user_login_data:
-            username = user_login_data['username']
-            halaman = "menu_utama"
-            if user_login_data['role'].lower() == "admin":
-                MenuAdmin()
-            else:
-                MenuUser()
-        else:
-            print("Username atau password salah")
-    elif pilihan_menu == "N":
-        print("Program Selesai, Terimakasih Telah Menggunakan Layanan Kami")
-    else:
-        print("Pilihan Tidak Valid")
-        input("Tekan Enter Untuk Kembali")
-
 def kembali():
     global halaman
     for i in range(2):
@@ -95,131 +144,218 @@ def kembali():
             halaman = riwayatHalaman.pop()
     
 def setup_halaman():
+    global halaman, riwayatHalaman
+    clear_screen()
     try:
         if riwayatHalaman[len(riwayatHalaman) - 1] != halaman:
             riwayatHalaman.append(halaman)
     except IndexError:
         riwayatHalaman.append(halaman)
     
-def MenuUtama():
+def menu_utama():
     global halaman, pilihan_menu
-    setup_halaman()
     
-    print("Menu Utama")
-    print("1. Manajemen Tanaman")
-    print("2. Manajemen User")
+    judul_halaman("Menu Utama")
+    print("Selamat datang, " + username + "!")
     print()
-    print("L. Log Out")
-    print("N. Keluar")
+    if data_user.cek_admin(username):
+        print("1 > Dashboard")
+        print("2 > Manajemen Tanaman")
+        print("3 > Manajemen User")
+        print()
+        print("S > Pengaturan")
+        print("N > Keluar")
+        print
+        separator()
 
-    pilihan_menu = input("Pilih menu: ").lower()
-    if pilihan_menu == "1":
-        halaman = "manajemen_tanaman"
-    elif pilihan_menu == "2":
-        halaman = "manajemen_user"
-    elif pilihan_menu == "l":
-        input("Berhasil logout...!")
-        logout()
-    elif pilihan_menu == "n":
-        input("Keluar program...!")
-        logout()
+        pilihan_menu = input("Pilih Menu >> ").lower()
+        if pilihan_menu == "1":
+            clear_screen()
+            judul_halaman("Dashboard")
+            print("Jumlah Tanaman: " + str(len(data_tanaman.load_data_tanaman())))
+            print("Jumlah User: " + str(len(data_user.load_data_user())))
+            separator()
+            input("Kembali ke menu...")
+        elif pilihan_menu == "2":
+            halaman = "manajemen_tanaman"
+        elif pilihan_menu == "3":
+            halaman = "manajemen_user"
+        elif pilihan_menu == "s":
+            halaman = "pengaturan"
+        elif pilihan_menu != "n":
+            input("Pilihan tidak valid, silakan coba lagi...")
+    elif data_user.cek_moderator(username):
+        print("1 > Manajemen Tanaman")
+        print()
+        print("S > Pengaturan")
+        print("N > Keluar")
+        separator()
+
+        pilihan_menu = input("Pilih Menu >> ").lower()
+        if pilihan_menu == "1":
+            halaman = "manajemen_tanaman"
+        elif pilihan_menu == "s":
+            halaman = "pengaturan"
+        elif pilihan_menu != "n":
+            input("Pilihan tidak valid, silakan coba lagi...")
     else:
-        input("Input tidak valid, silakan coba lagi.")
+        print("1 > Manajemen Tanaman")
+        print()
+        print("S > Pengaturan")
+        print("N > Keluar")
+        separator()
 
-def ManajemenTanaman():
+        pilihan_menu = input("Pilih Menu >> ").lower()
+        if pilihan_menu == "1":
+            halaman = "manajemen_tanaman"
+        elif pilihan_menu == "s":
+            halaman = "pengaturan"
+        elif pilihan_menu != "n":
+            input("Pilihan tidak valid, silakan coba lagi...")
+    if pilihan_menu == "n":
+        logout()
+
+def manajemen_tanaman():
     global halaman, pilihan_menu
-    setup_halaman()
 
-    print("Manajemen Tanaman")
-    print("1. Lihat Tanaman")
-    print("2. Tambah Data")
-    print("3. Edit Data")
-    print("4. Hapus Data")
-    print()
-    print("B. Kembali")
-    print("N. Keluar")
+    judul_halaman("Manajemen Tanaman")
+    if data_user.cek_admin(username) or data_user.cek_moderator(username):
+        print("1 > Lihat Tanaman")
+        print("2 > Tambah Tanaman")
+        print("3 > Edit Tanaman")
+        print("4 > Hapus Tanaman")
+        print()
+        print("B > Kembali")
+        print("S > Pengaturan")
+        print("N > Keluar")
+        separator()
 
-    pilihan_menu = input("Pilih menu:").lower()
-    if pilihan_menu == "1":
-        tampilkan_tanaman()
-        input("Kembali ke menu...")
-    elif pilihan_menu == "2":
-        tampilkan_tanaman()
-        data_tanaman.tambah_tanaman()
-    elif pilihan_menu == "3":
-        tampilkan_tanaman()
-        data_tanaman.edit_tanaman()
-    elif pilihan_menu == "4":
-        tampilkan_tanaman()
-        data_tanaman.hapus_tanaman()
-    elif pilihan_menu == "b":
-        kembali()
-    elif pilihan_menu == "l":
+        pilihan_menu = input("Pilih Menu >> ").lower()
+        if pilihan_menu == "1":
+            clear_screen()
+            tampilkan_tanaman()
+            input("Kembali ke menu...")
+        elif pilihan_menu == "2":
+            clear_screen()
+            tampilkan_tanaman()
+            data_tanaman.tambah_tanaman()
+        elif pilihan_menu == "3":
+            clear_screen()
+            tampilkan_tanaman()
+            data_tanaman.edit_tanaman()
+        elif pilihan_menu == "4":
+            clear_screen()
+            tampilkan_tanaman()
+            data_tanaman.hapus_tanaman()
+        elif pilihan_menu == "b":
+            kembali()
+        elif pilihan_menu == "s":
+            halaman = "pengaturan"
+        elif pilihan_menu != "n":
+            print()
+            input("Pilihan tidak valid, silakan coba lagi...")
+    else:
+        print("1 > Lihat Tanaman")
+        print()
+        print("B > Kembali")
+        print("S > Pengaturan")
+        print("N > Keluar")
+        separator()
+
+        pilihan_menu = input("Pilih Menu >> ").lower()
+        if pilihan_menu == "1":
+            clear_screen()
+            tampilkan_tanaman()
+            input("Kembali ke menu...")
+        elif pilihan_menu == "b":
+            kembali()
+        elif pilihan_menu == "s":
+            halaman = "pengaturan"
+        elif pilihan_menu != "n":
+            print()
+            input("Pilihan tidak valid, silakan coba lagi...")
+    if pilihan_menu == "n":
         logout()
-        input("Berhasil Logout...!")
-    elif pilihan_menu == "n":
-        logout()
-        input("Berhasil Keluar...!")
 
-def ManajemenUser():
+def manajemen_user():
     global halaman, pilihan_menu
-    setup_halaman()
 
-    print("Manajemen User")
-    print("1. Lihat User")
-    print("2. Tambah User")
-    print("3. Edit User")
-    print("4. Hapus User")
+    judul_halaman("Manajemen User")
+    print("1 > Lihat User")
+    print("2 > Register User")
+    print("3 > Blokir User")
+    print("4 > Edit Moderator")
     print()
-    print("B. Kembali")
-    print("N. Keluar")
+    print("B > Kembali")
+    print("S > Pengaturan")
+    print("N > Keluar")
+    separator()
 
-    pilihan_menu = input("Pilih menu:").lower()
+    pilihan_menu = input("Pilih Menu >> ").lower()
     if pilihan_menu == "1":
-        tampilkan_user()
-        input("Kembali ke menu...")
-    elif pilihan_menu == "2":
-        tampilkan_user()
-        data_user.tambah_user()
-    elif pilihan_menu == "3":
-        tampilkan_user()
-        data_user.edit_user()
-    elif pilihan_menu == "4":
-        tampilkan_user()
-        data_user.hapus_user()
-    elif pilihan_menu == "b":
-        kembali()
-    elif pilihan_menu == "l":
-        logout()
-        input("Berhasil Logout...!")
-    elif pilihan_menu == "n":
-        logout()
-        input("Berhasil Keluar...!")
-
-
-def MenuAdmin():
-    while logged_in():
         clear_screen()
-
-        if halaman == "menu_utama":
-            MenuUtama()
-        elif halaman == "manajemen_tanaman":
-            ManajemenTanaman()
-        elif halaman == "manajemen_user":
-            ManajemenUser()
-
-def MenuUser():
-    clear_screen()
-    global username, pilihan_menu
-
-    print("Menu Utama")
-    print("1. Lihat Data")
-    print("2. Keluar")
-
-    pilihan_menu = input("Pilih menu: ")
-    if pilihan_menu == "1":
-        tampilkan_tanaman()
+        tampilkan_user()
+        input("Kembali ke menu...")
     elif pilihan_menu == "2":
-        print("Keluar dari program.")
+        clear_screen()
+        menu_register()
+    elif pilihan_menu == "3":
+        ...
+    elif pilihan_menu == "4":
+        clear_screen()
+        judul_halaman("Moderator")
+        tampilkan_user([data_user.level[1], data_user.level[2]])
+        data_user.edit_status_moderator()
+    elif pilihan_menu == "b":
+        kembali()
+    elif pilihan_menu == "s":
+        halaman = "pengaturan"
+    elif pilihan_menu == "n":
+        logout()
     else:
-        print("Pilihan tidak valid, silakan coba lagi.")
+        print()
+        input("Pilihan tidak valid, silakan coba lagi...")
+
+def menu_pengaturan():
+    global halaman, pilihan_menu, username
+
+    judul_halaman("Pengaturan")
+    print("1 > Ubah Username")
+    print("2 > Ubah Password")
+    print("3 > Log Out")
+    print()
+    print("B > Kembali")
+    print("N > Keluar")
+    separator()
+
+    pilihan_menu = input("Pilih Menu >> ").lower()
+    if pilihan_menu == "1":
+        clear_screen()
+        judul_halaman("Ubah Username")
+        print("(Ket: Kosongkan input untuk kembali.)")
+        username_baru = input_string("Masukkan username baru: ")
+        if not username_baru: return
+        if (data_user.edit_username(username, username_baru)):
+            print()
+            input("Username berhasil diubah...!")
+            username = username_baru
+    elif pilihan_menu == "2":
+        clear_screen()
+        judul_halaman("Ubah Password")
+        print("(Ket: Kosongkan input untuk kembali.)")
+        password_baru = input("Masukkan password baru: ")
+        if not password_baru: return
+        if (data_user.edit_password(username, password_baru)):
+            print()
+            input("Password berhasil diubah...!")
+    elif pilihan_menu == "3":
+        print()
+        input("Berhasil Logout...!")
+        logout()
+    elif pilihan_menu == "b":
+        kembali()
+    elif pilihan_menu == "n":
+        logout()
+    else:
+        print()
+        input("Pilihan tidak valid, silakan coba lagi...")
