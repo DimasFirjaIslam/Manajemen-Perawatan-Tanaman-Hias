@@ -1,6 +1,7 @@
 from data.data_utility import *
 
 level = ("admin", "moderator", "user")
+status = ("aktif", "diblokir")
 
 def load_data_user(roles = []):
     data = load_data("data_user.json")
@@ -16,103 +17,124 @@ def simpan_data_user(databaru):
     simpan_data(databaru, "data_user.json")
 
 def login(username, password):
+    result = {
+        "data": None,
+        "status": False,
+        "message": ""
+    }
     users = load_data_user()
+    
     for user in users:
         if user['username'] == username and user['password'] == password:
-            return user
-    return False
+            if user['status'] == status[1]:
+                result["message"] = "Akun diblokir, silakan hubungi admin...!"
+                break
+            result["data"] = user
+            result["status"] = True
+            result["message"] = "Login berhasil...!"
+            break
+        else:
+            result["message"] = "Username atau password salah...!"
+    return result
 
-def register(username, password):
+def registrasi(username, password):
+    result = {
+        "status": False,
+        "message": ""
+    }
+
     users = load_data_user()
     users.append({
         "username" : username,
         "password" : password,
-        "role" : level[2]
+        "role" : level[2],
+        "status" : status[0]
     })
-    simpan_data_user(users)
+    
+    result["status"] = simpan_data_user(users)
+    result["message"] = "Registrasi berhasil...!"
+    return result
 
-# Fungsi untuk menambahkan atau menghapus role "Moderator" pada pengguna
-def edit_status_moderator():
+def edit_user(indeks_user, username, password, role, status):
     try:
-        data = load_data_user([level[1], level[2]])
-        print("(Ket: Kosongkan input untuk kembali ke menu.)")
-        nomor_pengguna = input("Masukkan pengguna yang ingin dipromosikan: ")
-        if not nomor_pengguna: return
-        nomor_pengguna = int(nomor_pengguna) - 1
-        if 0 <= nomor_pengguna < len(data):
-            while True:
-                # Jika status role pengguna adalah "User", maka akan dipromosikan menjadi "Moderator"
-                if data[nomor_pengguna]["role"] == level[2]:
-                    konfirmasi = input(f"Tambahkan {data[nomor_pengguna]['username']} sebagai Moderator? (y/n) ").lower()
-                    if konfirmasi == "y":
-                        edit_user(data[nomor_pengguna]["username"], data[nomor_pengguna]["password"], level[1])
-                        input(f"Berhasil menambahkan Moderator...!")
-                    elif konfirmasi == "n":
-                        input("Batal menambahkan Moderator...!")
-                        break
-                    else:
-                        input("Input tidak valid, silakan coba lagi...")
-
-                # Jika status role pengguna sudah "Moderator", maka akan dikembalikan menjadi role "User"
-                elif data[nomor_pengguna]["role"] == level[1]:
-                    konfirmasi = input(f"Hapus {data[nomor_pengguna]['username']} dari Moderator? (y/n) ").lower()
-                    if konfirmasi == "y":
-                        edit_user(data[nomor_pengguna]["username"], data[nomor_pengguna]["password"], level[2])
-                        input(f"Berhasil menghapus Moderator...!")
-                    elif konfirmasi == "n":
-                        input("Batal menghapus Moderator...!")
-                        break
-                    else:
-                        input("Input tidak valid, silakan coba lagi...")
-        else:
-            input("Pengguna tidak ditemukan...!")
-    except ValueError:
-        input("Nomor pengguna tidak valid, silakan coba lagi...")
-
-def edit_user(username, password, role = level[2]):
-    data = load_data_user()
-    for user in data:
-        if user['username'] == username:
-            user['username'] = username
-            user['password'] = password
-            user['role'] = role
-            simpan_data_user(data)
-            return True
-    return False
-
-def hapus_user():
-    try:
+        result = {
+            "status": False,
+            "message": ""
+        }
         data = load_data_user()
-        print("(Ket: Kosongkan input untuk kembali ke menu.)")
-        nomor_user = input("Masukkan pengguna yang ingin dihapus: ")
-        if not nomor_user: return
-        nomor_user = int(nomor_user) - 1
-        if nomor_user < len(data):
-            data.pop(nomor_user)
-            simpan_data_user(data)
-            input("Pengguna berhasil dihapus...!")
-        else:
-            input("Pengguna tidak ditemukan...!")
-    except ValueError:
-        input("Nomor pengguna tidak valid, silakan coba lagi...")
 
-def edit_username(username, username_baru):
-    data = load_data_user()
-    for user in data:
-        if user['username'] == username:
-            user['username'] = username_baru
-            simpan_data_user(data)
-            return True
-    return False
+        if str(indeks_user).strip() == "":
+            raise ValueError("Nomor pengguna tidak boleh kosong...!")
+        elif not str(indeks_user).isdigit():
+            raise ValueError("Nomor pengguna harus berupa angka...!")
+        elif role.lower() not in level:
+            raise ValueError("Role pengguna tidak valid...!")
+        elif role.lower() == level[0]:
+            raise ValueError("Role Admin tidak dapat diubah...!")
+        elif indeks_user < 0 or indeks_user >= len(data):
+            raise IndexError("Pengguna tidak ditemukan...")
+        
+        user = data[indeks_user]
+        user["username"] = username
+        user["password"] = password
+        user["role"] = role
+        user["status"] = status
 
-def edit_password(username, password_baru):
-    data = load_data_user()
-    for user in data:
-        if user['username'] == username:
-            user['password'] = password_baru
-            simpan_data_user(data)
-            return True
-    return False
+        result["status"] = simpan_data_user(data)
+        result["message"] = "Data berhasil diubah...!"
+    except IndexError or ValueError as e:
+        result["message"] = str(e)
+    finally:
+        return result
+
+def hapus_user(indeks_user: int):
+    try:
+        result = {
+            "status": False,
+            "message": ""
+        }
+        data = load_data_user()
+
+        if str(indeks_user).strip() == "":
+            raise ValueError("Nomor pengguna tidak boleh kosong...!")
+        elif not str(indeks_user).isdigit():
+            raise ValueError("Nomor pengguna harus berupa angka...!")
+        elif indeks_user < 0 or indeks_user >= len(data):
+            raise IndexError("Pengguna tidak ditemukan...")
+
+        data.pop(indeks_user)
+        result["status"] = simpan_data_user(data)
+        result["message"] = "Data berhasil dihapus...!"
+    except IndexError or ValueError as e:
+        result["message"] = str(e)
+    finally:
+        return result 
+
+# def edit_username(username, username_baru):
+#     data = load_data_user()
+#     for user in data:
+#         if user['username'] == username:
+#             user['username'] = username_baru
+#             simpan_data_user(data)
+#             return True
+#     return False
+
+# def edit_password(username, password_baru):
+#     result = {
+#         "status": False,
+#         "message": ""
+#     }
+#     data = load_data_user()
+#     for user in data:
+#         if user['username'] == username:
+#             user['password'] = password_baru
+#             simpan_data_user(data)
+#             result["status"] = True
+#             result["message"] = "Password berhasil diubah...!"
+#             break
+#         else:
+#             result["message"] = "Pengguna tidak ditemukan...!"
+#     return result
 
 def cek_role(username):
     data = load_data_user()
@@ -126,3 +148,10 @@ def cek_admin(username):
 
 def cek_moderator(username):
     return cek_role(username).lower() == level[1]
+
+def indeks_user(username):
+    data = load_data_user()
+    for i, user in enumerate(data):
+        if user['username'] == username:
+            return i
+    return False

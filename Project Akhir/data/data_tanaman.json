@@ -3,128 +3,171 @@
         "nama": "Bunga Kamboja",
         "jenis": "Bonsai Bunga",
         "jadwal_siram": "3 Hari Sekali",
-        "suhu": "24-35\u00b0C",
+        "min_suhu": 24.0,
+        "max_suhu": 35.0,
         "pemupukan": "2 Bulan Sekali",
-        "media_tanam": "Tanah Berpasir dengan Drainase Baik"
+        "media_tanam": "Tanah Berpasir"
     },
     {
         "nama": "Sirih Gading",
         "jenis": "Tropis Merambat",
         "jadwal_siram": "4 Hari Sekali",
-        "suhu": "20-30\u00b0C",
+        "min_suhu": 20.0,
+        "max_suhu": 30.0,
         "pemupukan": "2 Bulan Sekali",
-        "media_tanam": "Tanah dengan Drainase Baik"
+        "media_tanam": "Tanah"
     },
     {
         "nama": "Lidah Buaya",
         "jenis": "Sukulen",
         "jadwal_siram": "Seminggu Sekali",
-        "suhu": "15-25\u00b0C",
+        "min_suhu": 15.0,
+        "max_suhu": 25.0,
         "pemupukan": "3 Bulan Sekali",
-        "media_tanam": "Campuran Pasir dan Tanah"
+        "media_tanam": "Tanah Berpasir"
     },
     {
         "nama": "Lidah Mertua",
         "jenis": "Sukulen",
         "jadwal_siram": "Seminggu Sekali",
-        "suhu": "15-30\u00b0C",
+        "min_suhu": 15.0,
+        "max_suhu": 30.0,
         "pemupukan": "3 Bulan Sekali",
-        "media_tanam": "Campuran Pasir dan Tanah"
+        "media_tanam": "Tanah Berpasir"
     },
     {
         "nama": "Suplir",
         "jenis": "Tanaman Paku",
         "jadwal_siram": "Setiap Hari",
-        "suhu": "18-24\u00b0C",
+        "min_suhu": 18.0,
+        "max_suhu": 24.0,
         "pemupukan": "Sebulan Sekali",
-        "media_tanam": "Tanah Lembab dengan Humus"
+        "media_tanam": "Tanah Humus"
     },
     {
         "nama": "Sri Rejeki",
         "jenis": "Tropis",
         "jadwal_siram": "Seminggu Tiga Kali",
-        "suhu": "20-30\u00b0C",
+        "min_suhu": 20.0,
+        "max_suhu": 30.0,
         "pemupukan": "Sebulan Sekali",
-        "media_tanam": "Tanah Subur dengan Pupuk Organik"
+        "media_tanam": "Tanah Subur"
     },
     {
         "nama": "Daun Puring",
         "jenis": "Hias Berdaun Warna",
         "jadwal_siram": "Seminggu Tiga Kali",
-        "suhu": "20-32\u00b0C",
+        "min_suhu": 20.0,
+        "max_suhu": 32.0,
         "pemupukan": "Sebulan Sekali",
-        "media_tanam": "Tanah Campur Pasir"
+        "media_tanam": "Tanah Berpasir"
     },
     {
         "nama": "Lili Paris",
-        "jenis": "Semi-Sukulen",
+        "jenis": "Sukulen",
         "jadwal_siram": "Seminggu Dua Kali",
-        "suhu": "18-27\u00b0C",
+        "min_suhu": 18.0,
+        "max_suhu": 27.0,
         "pemupukan": "2 Bulan Sekali",
-        "media_tanam": "Tanah dengan Drainase Baik"
+        "media_tanam": "Tanah Subur"
     },
     {
         "nama": "Pucuk Merah",
         "jenis": "Tanaman Semak",
         "jadwal_siram": "Seminggu Tiga Kali",
-        "suhu": "22-32\u00b0C",
+        "min_suhu": 22.0,
+        "max_suhu": 32.0,
         "pemupukan": "Sebulan Sekali",
-        "media_tanam": "Tanah Subur dan Berpasir"
+        "media_tanam": "Tanah Subur"
     },
     {
         "nama": "Kuping Gajah",
         "jenis": "Tropis Berdaun Besar",
         "jadwal_siram": "Seminggu Dua Kali",
-        "suhu": "18-26\u00b0C",
+        "min_suhu": 18.0,
+        "max_suhu": 26.0,
         "pemupukan": "Sebulan Sekali",
-        "media_tanam": "Tanah dengan Drainase Baik"
+        "media_tanam": "Tanah Subur"
     },
     {
         "nama": "Monstera",
-        "jenis": "Tanaman Tropis",
+        "jenis": "Tropis",
         "jadwal_siram": "Seminggu Dua Kali",
-        "suhu": "18-30\u00b0C",
+        "min_suhu": 18.0,
+        "max_suhu": 30.0,
         "pemupukan": "2 Bulan Sekali",
-        "media_tanam": "Tanah dengan Campuran Pupuk Organik"
+        "media_tanam": "Tanah"
     },
     {
         "nama": "Calathea",
-        "jenis": "Tanaman Tropis",
+        "jenis": "Tropis",
         "jadwal_siram": "Seminggu Tiga Kali",
-        "suhu": "18-24\u00b0C",
+        "min_suhu": 18.0,
+        "max_suhu": 24.0,
         "pemupukan": "Sebulan Sekali",
-        "media_tanam": "Tanah Gambut yang Lembab"
+        "media_tanam": "Tanah Gambut"
     },
     {
         "nama": "Begonia",
         "jenis": "Tanaman Hias Berbunga",
         "jadwal_siram": "Seminggu Dua Kali",
-        "suhu": "18-24\u00b0C",
+        "min_suhu": 18.0,
+        "max_suhu": 24.0,
         "pemupukan": "2 Minggu Sekali",
-        "media_tanam": "Tanah Campuran Pasir dan Kompos"
+        "media_tanam": "Tanah Berpasir"
     },
     {
         "nama": "Kadaka",
         "jenis": "Tanaman Paku",
         "jadwal_siram": "Seminggu Dua Kali",
-        "suhu": "18-28\u00b0C",
+        "min_suhu": 18.0,
+        "max_suhu": 28.0,
         "pemupukan": "Sebulan Sekali",
-        "media_tanam": "Tanah Humus atau Pakis"
+        "media_tanam": "Tanah Humus"
     },
     {
         "nama": "Daun Dollar",
         "jenis": "Sukulen",
         "jadwal_siram": "Seminggu Sekali",
-        "suhu": "15-30\u00b0C",
+        "min_suhu": 15.0,
+        "max_suhu": 30.0,
         "pemupukan": "3 Bulan Sekali",
-        "media_tanam": "Campuran Pasir dan Tanah"
+        "media_tanam": "Tanah Berpasir"
     },
     {
         "nama": "Aglaonema",
         "jenis": "Tropis",
         "jadwal_siram": "Seminggu Dua Kali",
-        "suhu": "20-30\u00b0C",
+        "min_suhu": 20.0,
+        "max_suhu": 30.0,
         "pemupukan": "Sebulan Sekali",
-        "media_tanam": "Tanah Subur dan Lembab"
+        "media_tanam": "Tanah Subur"
+    },
+    {
+        "nama": "LOREM",
+        "jenis": "Tropis",
+        "jadwal_siram": "DSA",
+        "min_suhu": 20.0,
+        "max_suhu": 20.0,
+        "pemupukan": "UFHIS",
+        "media_tanam": "Tanah Gambut"
+    },
+    {
+        "nama": "test",
+        "jenis": 5,
+        "jadwal_siram": "1 Bulan Sekali",
+        "min_suhu": 15.0,
+        "max_suhu": 25.0,
+        "pemupukan": "4 Minggu Sekali",
+        "media_tanam": "Tanah Berpasir"
+    },
+    {
+        "nama": "Test2",
+        "jenis": "Tropis",
+        "jadwal_siram": "3232 Hari Sekali",
+        "min_suhu": 20.0,
+        "max_suhu": 23.0,
+        "pemupukan": "3 Minggu Sekali",
+        "media_tanam": "Tanah Lembab"
     }
 ]
