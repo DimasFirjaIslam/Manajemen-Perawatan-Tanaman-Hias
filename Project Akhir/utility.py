@@ -65,13 +65,13 @@ def input_pilihan(prompt, pilihan):
     
 def judul_halaman(nama_halaman):
     nama_halaman = f" {nama_halaman} "
-    print(nama_halaman.center(30, "="))
+    print(nama_halaman.center(45, "="))
 
 # def judul_halaman(nama_halaman):
 #     print(f"{"─"*10} {nama_halaman} {"─"*10}")
 
 def separator():
-    print("─"*30)
+    print("─"*45)
 
 def dialog_konfirmasi(pesan):
     while True:
@@ -83,9 +83,9 @@ def dialog_konfirmasi(pesan):
         else:
             input("Input tidak valid, silakan coba lagi...")
 
-def tabel(data):
+def tabel(data, headers="keys"):
     try:
         if data:
-            return tb.tabulate(data, headers="keys", tablefmt="grid", stralign="left", numalign="right")
+            return tb.tabulate(data, headers, tablefmt="fancy_grid", stralign="left", numalign="right")
     except Exception as e:
         return str(e)

@@ -40,5 +40,23 @@
         "password": "tes2",
         "role": "user",
         "status": "diblokir"
+    },
+    {
+        "username": "Remptyh",
+        "password": "Determination",
+        "role": "user",
+        "status": "aktif"
+    },
+    {
+        "username": "HackerTzy",
+        "password": "admin123",
+        "role": "user",
+        "status": "aktif"
+    },
+    {
+        "username": "userbaru",
+        "password": "userbaru123",
+        "role": "user",
+        "status": "aktif"
     }
 ]

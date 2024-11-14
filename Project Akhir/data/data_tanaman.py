@@ -1,4 +1,5 @@
 from data.data_utility import *
+import data.data_diskusi as data_diskusi
 
 jenis = (
     "Bonsai Bunga",
@@ -29,23 +30,23 @@ media_tanam = (
     "Tambus Gambut",
 )
 
-def load_data_tanaman(jenis_tanaman = [], jadwal_siram = [], min_suhu = 0, max_suhu = 0, pemupukan = [], media = []):
+def load_data_tanaman(jenis_tanaman = [], min_suhu = "", max_suhu = "", media = []):
     data = load_data("data_tanaman.json")
     data_terfilter = []
     for tanaman in data:
         if tanaman["jenis"] in jenis_tanaman if jenis_tanaman else True:
             data_terfilter.append(tanaman)
-            if tanaman["min_suhu"] < min_suhu if min_suhu else False:
+            if tanaman["min_suhu"] < int(min_suhu) if min_suhu else False:
                 data_terfilter.remove(tanaman)
-                continue
-            elif tanaman["max_suhu"] > max_suhu if max_suhu else False:
+            elif tanaman["max_suhu"] > int(max_suhu) if max_suhu else False:
                 data_terfilter.remove(tanaman)
-                continue
+            elif tanaman["media_tanam"] not in media if media else False:
+                data_terfilter.remove(tanaman)
     return data_terfilter
 
 
 def simpan_data_tanaman(databaru):
-    simpan_data(databaru, "data_tanaman.json")
+    return simpan_data(databaru, "data_tanaman.json")
 
 # Fungsi untuk menambahkan data tanaman baru
 def tambah_tanaman(nama, jenis, jadwal_siram, min_suhu, max_suhu, pemupukan, media_tanam):
@@ -79,13 +80,14 @@ def tambah_tanaman(nama, jenis, jadwal_siram, min_suhu, max_suhu, pemupukan, med
         return result
 
 # Fungsi untuk menampilkan data tanaman
-def edit_tanaman(indeks_tanaman: int, nama, jenis, jadwal_siram, min_suhu, max_suhu, pemupukan, media_tanam):
+def edit_tanaman(indeks_tanaman: int, nama_baru, jenis_baru, jadwal_siram_baru, min_suhu_baru, max_suhu_baru, pemupukan_baru, media_tanam_baru):
     try:
         result = {
             "status": False,
             "message": ""
         }
         data = load_data_tanaman()
+        tanaman = data[indeks_tanaman]
 
         if str(indeks_tanaman).strip() == "":
             raise ValueError("Nomor tanaman tidak boleh kosong...!")
@@ -94,14 +96,20 @@ def edit_tanaman(indeks_tanaman: int, nama, jenis, jadwal_siram, min_suhu, max_s
         elif indeks_tanaman < 0 or indeks_tanaman >= len(data):
             raise IndexError("Tanaman tidak ditemukan...")
         
-        tanaman = data[indeks_tanaman]
-        tanaman["nama"] = nama
-        tanaman["jenis"] = jenis
-        tanaman["jadwal_siram"] = jadwal_siram
-        tanaman["min_suhu"] = min_suhu
-        tanaman["max_suhu"] = max_suhu
-        tanaman["pemupukan"] = pemupukan
-        tanaman["media_tanam"] = media_tanam
+        # Memperbarui data diskusi yang menyangkut dengan tanaman yang diedit
+        list_diskusi = data_diskusi.load_data_diskusi()
+        for diskusi in list_diskusi:
+            if diskusi["tanaman"] == tanaman["nama"]:
+                diskusi["tanaman"] = nama_baru
+        data_diskusi.simpan_data_diskusi(list_diskusi)
+        
+        tanaman["nama"] = nama_baru
+        tanaman["jenis"] = jenis_baru
+        tanaman["jadwal_siram"] = jadwal_siram_baru
+        tanaman["min_suhu"] = min_suhu_baru
+        tanaman["max_suhu"] = max_suhu_baru
+        tanaman["pemupukan"] = pemupukan_baru
+        tanaman["media_tanam"] = media_tanam_baru
         
         result["status"] = simpan_data_tanaman(data)
         result["message"] = "Data berhasil diubah...!"

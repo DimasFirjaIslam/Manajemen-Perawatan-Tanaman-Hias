@@ -1,0 +1,116 @@
+[
+    {
+        "judul": "Diskusi 1",
+        "tanaman": "Monstera",
+        "tanggal": "10-11-2024",
+        "penulis": "user",
+        "konten": "Apakah Monstera bisa diletakkan di dalam kamar?",
+        "jawaban": [
+            {
+                "penulis": "moderator",
+                "konten": "Monstera bisa diletakkan di dalam kamar asal mendapat cahaya matahari yang cukup."
+            }
+        ]
+    },
+    {
+        "judul": "Diskusi 2",
+        "tanaman": "Calathea",
+        "tanggal": "12-11-2024 15:30",
+        "penulis": "user",
+        "konten": "Bagaimana cara merawat Calathea?",
+        "jawaban": [
+            {
+                "penulis": "moderator",
+                "konten": "Calathea memerlukan sinar matahari yang tidak langsung dan tanah yang lembab."
+            }
+        ]
+    },
+    {
+        "judul": "Diskusi 3",
+        "tanaman": "Aglaonema",
+        "tanggal": "13-11-2024 10:46",
+        "penulis": "user",
+        "konten": "Apakah Aglaonema bisa diletakkan di dalam kamar?",
+        "jawaban": [
+            {
+                "penulis": "moderator",
+                "konten": "Aglaonema bisa diletakkan di dalam kamar asal mendapat cahaya matahari yang cukup."
+            }
+        ]
+    },
+    {
+        "judul": "Halo",
+        "tanaman": "Bunga Kamboja",
+        "penulis": "MTHermawan",
+        "konten": "Dunia",
+        "tanggal": "13-11-2024 17:29",
+        "jawaban": [
+            {
+                "penulis": "MTHermawan",
+                "konten": "idk",
+                "tanggal": "13-11-2024 19:20:57"
+            },
+            {
+                "penulis": "MTHermawan",
+                "konten": "p",
+                "tanggal": "13-11-2024 19:21:56"
+            }
+        ]
+    },
+    {
+        "judul": "tes",
+        "tanaman": "Bunga Kamboja",
+        "penulis": "MTHermawan",
+        "konten": "tes",
+        "tanggal": "13-11-2024 20:02",
+        "jawaban": [
+            {
+                "penulis": "MTHermawan",
+                "konten": "tes",
+                "tanggal": "13-11-2024 20:02:30"
+            },
+            {
+                "penulis": "MTHermawan",
+                "konten": "Yo ndak tahu",
+                "tanggal": "13-11-2024 20:03:51"
+            },
+            {
+                "penulis": "user",
+                "konten": "tes",
+                "tanggal": "14-11-2024 20:27:55"
+            }
+        ]
+    },
+    {
+        "judul": "gk tahu",
+        "tanaman": "Bunga Kamboja",
+        "penulis": "MTHermawan",
+        "konten": "gk tahu juga",
+        "tanggal": "13-11-2024 20:04",
+        "jawaban": []
+    },
+    {
+        "judul": "Bagaimana cara saya blablabla",
+        "tanaman": "Tanaman Baru",
+        "penulis": "MTHermawan",
+        "konten": "ini deskripsi permasalahannya",
+        "tanggal": "14-11-2024 21:11",
+        "jawaban": [
+            {
+                "penulis": "MTHermawan",
+                "konten": "Harus gini2",
+                "tanggal": "14-11-2024 21:11:17"
+            },
+            {
+                "penulis": "user",
+                "konten": "Jawaban lain",
+                "tanggal": "14-11-2024 21:35:48"
+            },
+            {
+                "penulis": "mod",
+                "konten": "Tes",
+                "tanggal": "14-11-2024 21:40:47"
+            }
+        ]
+    }
+]
