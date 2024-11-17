@@ -1,6 +1,7 @@
 from data.data_utility import *
 import data.data_diskusi as data_diskusi
 
+# Mendeklarasikan jenis tanaman, satuan waktu, dan media tanam yang tersedia
 jenis = (
     "Bonsai Bunga",
     "Tropis",
@@ -30,10 +31,12 @@ media_tanam = (
     "Tambus Gambut",
 )
 
+# Fungsi untuk mengambil data tanaman dari file JSON dengan nama file "data_tanaman.json"
 def load_data_tanaman(jenis_tanaman = [], min_suhu = "", max_suhu = "", media = []):
     data = load_data("data_tanaman.json")
     data_terfilter = []
     for tanaman in data:
+        # Memfilter data tanaman berdasarkan jenis tanaman, suhu, dan media tanam
         if tanaman["jenis"] in jenis_tanaman if jenis_tanaman else True:
             data_terfilter.append(tanaman)
             if tanaman["min_suhu"] < int(min_suhu) if min_suhu else False:
@@ -44,7 +47,7 @@ def load_data_tanaman(jenis_tanaman = [], min_suhu = "", max_suhu = "", media = 
                 data_terfilter.remove(tanaman)
     return data_terfilter
 
-
+# Fungsi untuk menyimpan data tanaman ke dalam file JSON dengan nama file "data_tanaman.json"
 def simpan_data_tanaman(databaru):
     return simpan_data(databaru, "data_tanaman.json")
 
@@ -86,9 +89,11 @@ def edit_tanaman(indeks_tanaman: int, nama_baru, jenis_baru, jadwal_siram_baru, 
             "status": False,
             "message": ""
         }
+        # Menduplikasi data tanaman dari database dan mengambil data tanaman dengan indeks spesifik
         data = load_data_tanaman()
         tanaman = data[indeks_tanaman]
 
+        # Beberapa syarat yang harus dipenuhi untuk mengubah data tanaman
         if str(indeks_tanaman).strip() == "":
             raise ValueError("Nomor tanaman tidak boleh kosong...!")
         elif not str(indeks_tanaman).isdigit():
@@ -103,6 +108,7 @@ def edit_tanaman(indeks_tanaman: int, nama_baru, jenis_baru, jadwal_siram_baru, 
                 diskusi["tanaman"] = nama_baru
         data_diskusi.simpan_data_diskusi(list_diskusi)
         
+        # Memperbarui data tanaman dengan data baru
         tanaman["nama"] = nama_baru
         tanaman["jenis"] = jenis_baru
         tanaman["jadwal_siram"] = jadwal_siram_baru
@@ -111,8 +117,10 @@ def edit_tanaman(indeks_tanaman: int, nama_baru, jenis_baru, jadwal_siram_baru, 
         tanaman["pemupukan"] = pemupukan_baru
         tanaman["media_tanam"] = media_tanam_baru
         
+        # Menimpa data tanaman yang lama dengan duplikasi yang telah diubah
         result["status"] = simpan_data_tanaman(data)
         result["message"] = "Data berhasil diubah...!"
+        return result
     except IndexError or ValueError as e:
         result["message"] = str(e)
     finally:
@@ -124,33 +132,28 @@ def hapus_tanaman(indeks_tanaman: int):
             "status": False,
             "message": ""
         }
+        # Menduplikasi data tanaman dari database
         data = load_data_tanaman()
 
-        if str(indeks_tanaman).strip() == "":
-            raise ValueError("Nomor tanaman tidak boleh kosong...!")
-        elif not str(indeks_tanaman).isdigit():
-            raise ValueError("Nomor tanaman harus berupa angka...!")
-        elif indeks_tanaman < 0 or indeks_tanaman >= len(data):
+        # Syarat yang harus dipenuhi untuk menghapus data tanaman
+        if indeks_tanaman < 0 or indeks_tanaman >= len(data):
             raise IndexError("Tanaman tidak ditemukan...")
         
+        # Menghapus data tanaman dengan indeks terkait pada duplikasi
         data.pop(indeks_tanaman)
+
+        # Menimpa data tanaman yang lama dengan duplikasi yang telah diubah
         result["status"] = simpan_data_tanaman(data)
         result["message"] = "Tanaman berhasil dihapus...!"
+        return result
     except IndexError or ValueError as e:
         result["message"] = str(e)
     finally:
         return result
-        
 
-def cek_index(nama_tanaman):
+# Fungsi untuk mengecek indeks tanaman berdasarkan namanya
+def cek_indeks(nama_tanaman):
     data = load_data_tanaman()
     for i, item in enumerate(data):
         if item["nama"] == nama_tanaman:
             return i
-        
-# A > Jenis Tanaman ("Sukulen", "Kaktus", "Bunga", "Sayuran", "Buah")
-# B > Minimal Suhu (10 C)
-# C > Maksimal Suhu (40 C)
-
-# D > Hapus Filter
-# E > Kembali

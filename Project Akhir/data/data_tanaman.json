@@ -144,33 +144,6 @@
         "media_tanam": "Tanah Subur"
     },
     {
-        "nama": "test",
-        "jenis": 5,
-        "jadwal_siram": "1 Bulan Sekali",
-        "min_suhu": 15.0,
-        "max_suhu": 25.0,
-        "pemupukan": "4 Minggu Sekali",
-        "media_tanam": "Tanah Berpasir"
-    },
-    {
-        "nama": "Test5",
-        "jenis": 2,
-        "jadwal_siram": "2 Minggu Sekali",
-        "min_suhu": 2.0,
-        "max_suhu": 2.0,
-        "pemupukan": "2 Minggu Sekali",
-        "media_tanam": "Tanah Berpasir"
-    },
-    {
-        "nama": "Tanaman tes",
-        "jenis": 5,
-        "jadwal_siram": "3 Minggu Sekali",
-        "min_suhu": 20.0,
-        "max_suhu": 30.0,
-        "pemupukan": "3 Bulan Sekali",
-        "media_tanam": "Tanah Subur"
-    },
-    {
         "nama": "Tanaman Baru",
         "jenis": "Tropis Merambat",
         "jadwal_siram": "3 Minggu Sekali",
@@ -180,12 +153,12 @@
         "media_tanam": "Tanah Berpasir"
     },
     {
-        "nama": "Tes",
-        "jenis": "Sukulen",
+        "nama": "Kipli",
+        "jenis": "Tropis",
         "jadwal_siram": "3 Minggu Sekali",
-        "min_suhu": 12.0,
-        "max_suhu": 54.0,
-        "pemupukan": "2 Minggu Sekali",
-        "media_tanam": "Tanah Subur"
+        "min_suhu": 4.0,
+        "max_suhu": 5.0,
+        "pemupukan": "1 Minggu Sekali",
+        "media_tanam": "Tanah Humus"
     }
 ]

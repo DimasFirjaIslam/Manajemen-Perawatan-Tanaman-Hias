@@ -7,6 +7,7 @@ username = ""
 pilihan_menu = ""
 riwayatHalaman = []
 halaman = ""
+data_page = 1
 
 # ------------------------------------------------------------
 # Fungsi mengenai variabel login-logout di Menu
@@ -47,25 +48,36 @@ def setup_halaman():
 # Fungsi singkat untuk membuat tampilan data dari database
 
 # Fungsi menampilkan data tanaman dalam bentuk tabel
-def tampilkan_tanaman():
-    data = []
-    for i, item in enumerate(data_tanaman.load_data_tanaman()):
-        data.append({
-            "No": i + 1,
-            "Nama": item["nama"],
-            "Jenis": item["jenis"],
-            "Jadwal Siram": item["jadwal_siram"],
-            "Suhu": f"{item["min_suhu"]}{"—" + str(item["max_suhu"]) if item["max_suhu"] > item["min_suhu"] else ""} °C",
-            "Pemupukan": item["pemupukan"],
-            "Media Tanam": item["media_tanam"]
-        })
+def tampilkan_tanaman(table_page = 1, limit = 5):
+    data = data_tanaman.load_data_tanaman()
+    baris_data = []
+    total_halaman = len(data) // limit + 1
+    indeks_tersedia = {}
+    if table_page > total_halaman:
+        table_page = total_halaman
+    elif table_page < 1:
+        table_page = 1
+    
+    for i, item in enumerate(data):
+        if i >= (table_page - 1) * limit and i < table_page * limit:
+            baris_data.append({
+                "No": i + 1,
+                "Nama": item["nama"],
+                "Jenis": item["jenis"],
+                "Jadwal Siram": item["jadwal_siram"],
+                "Suhu": f"{item["min_suhu"]}{"—" + str(item["max_suhu"]) if item["max_suhu"] > item["min_suhu"] else ""} °C",
+                "Pemupukan": item["pemupukan"],
+                "Media Tanam": item["media_tanam"]
+            })
+            indeks_tersedia[str(i + 1)] = data_tanaman.cek_indeks(item["nama"])
 
     if data:
-        dt = tabel(data)
+        dt = tabel(baris_data)
         print(dt)
     else:
         print()
         print("Tidak ada data yang tersedia.")
+    return indeks_tersedia
 
 # Fungsi menampilkan pilihan jenis tanaman
 def tampilkan_jenis_tanaman():
@@ -232,7 +244,7 @@ def form_tambah_tanaman():
                 max_suhu = float(max_suhu)
                 if max_suhu < min_suhu:
                     print()
-                    input("Suhu maksimum harus lebih besar dari suhu minimum...!")
+                    input(f"Suhu maksimum harus lebih besar dari suhu minimum...! (Min: {min_suhu}, Maks: {max_suhu})")
                     continue
                 break
             break
@@ -269,43 +281,55 @@ def form_tambah_tanaman():
         input(e)
         form_tambah_tanaman()
 
-def form_edit_tanaman():
+def form_edit_tanaman(table_page = 1):
     try:
-        clear_screen()
-        judul_halaman("Edit Tanaman")
-        tampilkan_tanaman()
-        separator()
+        limit = 5
         data = data_tanaman.load_data_tanaman()
 
+        clear_screen()
+        judul_halaman("Edit Tanaman")
+        indeks_tersedia = tampilkan_tanaman(table_page, limit)
+        print()
+
         if data:
-            print("(Ket: Kosongkan input untuk mempertahankan nilai lama.)")
-            indeks_tanaman = input("Nomor Tanaman\t\t\t: ")
+            if table_page > 1:
+                print("Q > Halaman Sebelumnya", end=" ")
+            if table_page > 1 and table_page < (len(data) - 1) // limit + 1:
+                print("|", end=" ")
+            if table_page < (len(data) - 1) // limit + 1:
+                print("E > Halaman Selanjutnya", end=" ")
+            print()
+            separator()
+            print("(Ket: Kosongkan input untuk kembali.)")
+            pilihan_edit = input_fixed("Pilih menu atau tanaman\t: ").lower()
             separator()
         else:
             input("Kembali ke menu...!")
             return
         
-        if indeks_tanaman.strip():
-            if not indeks_tanaman.isdigit():
-                raise ValueError("Nomor tanaman harus berupa angka...!")
-            indeks_tanaman = int(indeks_tanaman) - 1
-
-            if indeks_tanaman < 0 or indeks_tanaman >= len(data):
+        if pilihan_edit.strip():
+            if pilihan_edit == "q" and table_page > 1:
+                return form_edit_tanaman(table_page - 1)
+            elif pilihan_edit == "e" and table_page < (len(data) - 1) // limit + 1:
+                return form_edit_tanaman(table_page + 1)
+            elif not checkNumString(pilihan_edit):
+                raise ValueError("Pilihan menu tidak ada...!")
+            elif not any(pilihan_edit == nomor for nomor in indeks_tersedia):
                 raise IndexError("Tanaman tidak ditemukan...!")
-            tanaman = data[indeks_tanaman]
+            tanaman_edit = data[indeks_tersedia[pilihan_edit]]
         else:
             return
-            
     
         while True:
-            nama = input_string("Nama Tanaman (Maks 30 Huruf)\t: ") or tanaman["nama"]
+            print("(Ket: Kosongkan input untuk mempertahankan nilai lama.)")
+            nama = input_string("Nama Tanaman (Maks 30 Huruf)\t: ") or tanaman_edit["nama"]
             if not nama:
                 return
             elif len(nama) > 30:
                 print()
                 input("Nama tanaman maksimal 30 karakter...!")
                 continue
-            elif any(tanaman["nama"].lower() == nama.lower() and tanaman["nama"].lower() != data[indeks_tanaman]["nama"].lower() for tanaman in data):
+            elif any(tanaman["nama"].lower() == nama.lower() and tanaman["nama"].lower() != tanaman_edit["nama"].lower() for tanaman in data):
                 print()
                 input("Tanaman sudah terdaftar...!")
                 continue
@@ -313,115 +337,133 @@ def form_edit_tanaman():
 
         separator()
         tampilkan_jenis_tanaman()
-        pilihan_jenis = input_pilihan("Jenis Tanaman\t\t\t: ", range(1, len(data_tanaman.jenis) + 1) or data[indeks_tanaman]["jenis"])
-        if not pilihan_jenis: return
-        jenis = data_tanaman.jenis[pilihan_jenis - 1]
+        pilihan_jenis = input_pilihan("Jenis Tanaman\t\t\t: ", range(1, len(data_tanaman.jenis) + 1))
+        jenis = data_tanaman.jenis[pilihan_jenis - 1] if pilihan_jenis else tanaman_edit["jenis"]
         
         separator()
         tampilkan_satuan_waktu()
-        satuan_siram = input_pilihan("Satuan Lama Penyiraman\t\t: ", range(1, len(data_tanaman.satuan_waktu) + 1) or data[indeks_tanaman]["jadwal_siram"])
+        satuan_siram = input_pilihan("Satuan Lama Penyiraman\t\t: ", range(1, len(data_tanaman.satuan_waktu) + 1))
         if satuan_siram:
             while True:
-                jadwal_siram = input_fixed(f"Lama Penyiraman ({data_tanaman.satuan_waktu[satuan_siram - 1]}) \t: ") or data[indeks_tanaman]["jadwal_siram"]
-                if jadwal_siram == "":
-                    return
-                elif not jadwal_siram.isdigit():
+                jadwal_siram = input_fixed(f"Lama Penyiraman ({data_tanaman.satuan_waktu[satuan_siram - 1]}) \t: ")
+                if not checkNumString(jadwal_siram):
                     print()
                     input("Input harus angka...!")
                     continue
+                elif int(jadwal_siram) < 1:
+                    print()
+                    input("Minimal lama harus 1...!")
+                    continue
                 break
             jadwal_siram = f"{jadwal_siram} {data_tanaman.satuan_waktu[satuan_siram - 1]} Sekali"
+        else:
+            jadwal_siram = tanaman_edit["jadwal_siram"]
         
         separator()
         while True:
-            min_suhu = input_fixed("Suhu Minimum (°C)\t\t: ")
-            if min_suhu == "": return
-            elif not min_suhu.isdigit():
+            min_suhu = input_fixed("Suhu Minimum (°C)\t\t: ") or tanaman_edit["min_suhu"]
+            if not checkNumString(min_suhu):
                 print()
                 input("Input harus angka...!")
                 continue
             min_suhu = float(min_suhu)
             
             while True:
-                max_suhu = input_fixed("Suhu Maksimum (°C)\t\t: ")
-                if max_suhu == "": return
-                elif not max_suhu.isdigit():
+                max_suhu = input_fixed("Suhu Maksimum (°C)\t\t: ") or tanaman_edit["max_suhu"]
+                if not checkNumString(max_suhu):
                     print()
                     input("Input harus angka...!")
                     continue
                 max_suhu = float(max_suhu)
                 if max_suhu < min_suhu:
                     print()
-                    input("Suhu maksimum harus lebih besar dari suhu minimum...!")
+                    input(f"Suhu maksimum harus lebih besar dari suhu minimum...! (Min: {min_suhu}, Maks: {max_suhu})")
                     continue
                 break
             break
 
         separator()
         tampilkan_satuan_waktu()
-        satuan_pemupukan = input_pilihan("Satuan Lama Pemupukan\t\t: ", range(1, len(data_tanaman.satuan_waktu) + 1) or data[indeks_tanaman]["pemupukan"])
+        satuan_pemupukan = input_pilihan("Satuan Lama Pemupukan\t\t: ", range(1, len(data_tanaman.satuan_waktu) + 1))
         if satuan_pemupukan:
             while True:
-                pemupukan = input_fixed(f"Lama Pemupukan ({data_tanaman.satuan_waktu[satuan_pemupukan - 1]})\t\t: ") or data[indeks_tanaman]["pemupukan"]
+                pemupukan = input_fixed(f"Lama Pemupukan ({data_tanaman.satuan_waktu[satuan_pemupukan - 1]})\t\t: ") or tanaman_edit["pemupukan"]
                 if pemupukan == "":
                     return
-                elif not pemupukan.isdigit():
+                elif not checkNumString(pemupukan):
                     print()
                     input("Input harus angka...!")
                     continue
+                elif int(pemupukan) < 1:
+                    print()
+                    input("Minimal lama harus 1...!")
                 break
             pemupukan = f"{pemupukan} {data_tanaman.satuan_waktu[satuan_pemupukan - 1]} Sekali"
+        else:
+            pemupukan = tanaman_edit["pemupukan"]
         
         separator()
         tampilkan_media_tanam()
-        pilihan_media = input_pilihan("Media Tanam\t\t\t: ", range(1, len(data_tanaman.media_tanam) + 1) or data[indeks_tanaman]["media_tanam"])
-        media_tanam = data_tanaman.media_tanam[pilihan_media - 1]
+        pilihan_media = input_pilihan("Media Tanam\t\t\t: ", range(1, len(data_tanaman.media_tanam) + 1))
+        media_tanam = data_tanaman.media_tanam[pilihan_media - 1] if pilihan_media else tanaman_edit["media_tanam"]
 
-        edit_data = data_tanaman.edit_tanaman(indeks_tanaman, nama, jenis, jadwal_siram, min_suhu, max_suhu, pemupukan, media_tanam)
+        edit_data = data_tanaman.edit_tanaman(indeks_tersedia[pilihan_edit], nama, jenis, jadwal_siram, min_suhu, max_suhu, pemupukan, media_tanam)
         
         separator()
         input(edit_data.get("message"))
     except Exception as e:
-        print()
         input(e)
-        form_edit_tanaman()
+        return form_edit_tanaman(table_page)
 
-def form_hapus_tanaman():
+def form_hapus_tanaman(table_page = 1):
     try:
-        clear_screen()
-        judul_halaman("Hapus Tanaman")
-        tampilkan_tanaman()
-        separator()
+        limit = 5
         data = data_tanaman.load_data_tanaman()
 
+        clear_screen()
+        judul_halaman("Hapus Tanaman")
+        indeks_tersedia = tampilkan_tanaman(table_page, limit)
+        print()
+
         if data:
+            if table_page > 1:
+                print("Q > Halaman Sebelumnya", end=" ")
+            if table_page > 1 and table_page < (len(data) - 1) // limit + 1:
+                print("|", end=" ")
+            if table_page < (len(data) - 1) // limit + 1:
+                print("E > Halaman Selanjutnya", end=" ")
+            print()
+            separator()
             print("(Ket: Kosongkan input untuk kembali.)")
-            indeks_tanaman = input("Nomor Tanaman: ")
+            pilihan_hapus = input_fixed("Pilih menu atau tanaman: ").lower()
+            separator()
         else:
             input("Kembali ke menu...!")
             return
 
-        if indeks_tanaman.strip():
-            if not indeks_tanaman.isdigit():
-                raise ValueError("Nomor tanaman harus berupa angka...!")
-            indeks_tanaman = int(indeks_tanaman) - 1
-
-            if indeks_tanaman < 0 or indeks_tanaman >= len(data):
+        if pilihan_hapus.strip():
+            if pilihan_hapus == "q" and table_page > 1:
+                return form_hapus_tanaman(table_page - 1)
+            elif pilihan_hapus == "e" and table_page < (len(data) - 1) // limit + 1:
+                return form_hapus_tanaman(table_page + 1)
+            elif not checkNumString(pilihan_hapus):
+                raise ValueError("Pilihan menu tidak ada...!")
+            elif not any(pilihan_hapus == nomor for nomor in indeks_tersedia):
                 raise IndexError("Tanaman tidak ditemukan...!")
+            tanaman = data[indeks_tersedia[pilihan_hapus]]
         else:
             return
         
-        if (dialog_konfirmasi(f"Yakin ingin menghapus {data[indeks_tanaman]["nama"]}?")):
-            hapus_data = data_tanaman.hapus_tanaman(indeks_tanaman)
+        if (dialog_konfirmasi(f"Yakin ingin menghapus {tanaman["nama"]}?")):
+            hapus_data = data_tanaman.hapus_tanaman(indeks_tersedia[pilihan_hapus])
             separator()
             input(hapus_data.get("message"))
         else:
-            print()
+            separator()
             input("Batal menghapus tanaman...!")
     except Exception as e:
-        print()
         input(e)
-        form_hapus_tanaman()
+        return form_hapus_tanaman(table_page)
 
 def form_edit_username():
     global username
@@ -451,7 +493,6 @@ def form_edit_username():
             else:
                 input(edit_data["message"])
     except Exception as e:
-        print()
         input(e)
         form_edit_username()
 
@@ -691,7 +732,6 @@ def menu_utama():
             input("Pilihan tidak valid, silakan coba lagi...")
             pilihan_menu = ""
 
-data_page_tanaman = 1
 filter_tanaman = {}
 def manajemen_tanaman():
     global halaman, pilihan_menu, data_page_tanaman, filter_tanaman
@@ -712,7 +752,7 @@ def manajemen_tanaman():
         for i, item in enumerate(data):
             if i >= (data_page_tanaman - 1) * 5 and i < data_page_tanaman * 5:
                 print(f"{i + 1} > {item["nama"]} ({item["jenis"]})")
-                nomor_indeks_tersedia[str(i + 1)] = data_tanaman.cek_index(item["nama"])
+                nomor_indeks_tersedia[str(i + 1)] = data_tanaman.cek_indeks(item["nama"])
 
         if total_halaman > 1:
             print()
@@ -727,7 +767,6 @@ def manajemen_tanaman():
         print("B > Kembali")
         print("S > Pengaturan")
         separator()
-
         pilihan_menu = input("Pilih Menu >> ").lower()
         if pilihan_menu == "a":
             form_tambah_tanaman()
@@ -737,7 +776,7 @@ def manajemen_tanaman():
             form_hapus_tanaman()
         elif pilihan_menu == "f":
             menu_filter_tanaman()
-        elif any(pilihan_menu == str(nomor) for nomor in nomor_indeks_tersedia):
+        elif any(pilihan_menu == nomor for nomor in nomor_indeks_tersedia):
             halaman = f"detail_tanaman?{nomor_indeks_tersedia[pilihan_menu]}"
         elif pilihan_menu == "q" and data_page_tanaman > 1:
             data_page_tanaman -= 1
@@ -764,7 +803,7 @@ def manajemen_tanaman():
         for i, item in enumerate(data):
             if i >= (data_page_tanaman - 1) * 5 and i < data_page_tanaman * 5:
                 print(f"{i + 1} > {item["nama"]} ({item["jenis"]})")
-                nomor_indeks_tersedia[str(i + 1)] = data_tanaman.cek_index(item["nama"])
+                nomor_indeks_tersedia[str(i + 1)] = data_tanaman.cek_indeks(item["nama"])
 
         print()
         print(f"({data_page_tanaman} dari {total_halaman} halaman)")
@@ -821,8 +860,9 @@ def menu_filter_tanaman():
     print("2 > Suhu", suhu_aktif)
     print("3 > Media Tanam", media_aktif)
     print()
-    print("C > Clear Filter")
+    print("R > Hapus Filter")
     print("B > Kembali") 
+    separator()
 
     pilihan_menu = input("Pilih Menu >> ").lower()
     if pilihan_menu == "1":
@@ -831,7 +871,7 @@ def menu_filter_tanaman():
             judul_halaman("Filter Jenis Tanaman")
             for i, item in enumerate(data_tanaman.jenis, start=1):
                 print(f"{i} > {green_text if item in filter_tanaman.get('jenis', []) else ""}{item}{white_text}")
-            print()
+            separator()
             print("(Ket: Kosongkan input untuk kembali.)")
             pilihan_menu = input_pilihan("Pilih Jenis Tanaman: ", range(1, len(data_tanaman.jenis) + 1))
             if not pilihan_menu:
@@ -866,7 +906,7 @@ def menu_filter_tanaman():
 
                 if max_suhu < min_suhu if min_suhu != "" and max_suhu != "" else False:
                     print()
-                    input("Suhu maksimum harus lebih besar dari suhu minimum...!")
+                    input(f"Suhu maksimum harus lebih besar dari suhu minimum...! (Min: {min_suhu}, Maks: {max_suhu})")
                     continue
                 break
             filter_tanaman["min_suhu"] = min_suhu
@@ -879,7 +919,7 @@ def menu_filter_tanaman():
             judul_halaman("Filter Media Tanam")
             for i, item in enumerate(data_tanaman.media_tanam, start=1):
                 print(f"{i} > {green_text if item in filter_tanaman.get('media_tanam', []) else ""}{item}{white_text}")
-            print()
+            separator()
             print("(Ket: Kosongkan input untuk kembali.)")
             pilihan_menu = input_pilihan("Pilih Media Tanam: ", range(1, len(data_tanaman.media_tanam) + 1))
             if not pilihan_menu:
