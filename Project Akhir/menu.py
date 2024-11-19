@@ -10,7 +10,7 @@ halaman = ""
 data_page = 1
 
 # ------------------------------------------------------------
-# Fungsi mengenai variabel login-logout di Menu
+# Utilitas Menu
 
 # Memeriksa apakah pengguna sudah login
 def cek_login():
@@ -22,9 +22,6 @@ def logout():
     username = ""
     riwayatHalaman.clear()
     halaman = ""
-
-# ------------------------------------------------------------
-# Fungsi Utilitas Halaman Menu
 
 # Fungsi untuk kembali ke halaman sebelumnya dengan riwayat halaman
 def kembali():
@@ -44,9 +41,302 @@ def setup_halaman():
     except IndexError:
         riwayatHalaman.append(halaman)
 
+# End Utilitas Menu
 # ------------------------------------------------------------
-# Fungsi singkat untuk membuat tampilan data dari database
+# CRUD User
 
+# Fungsi menampilkan username dan role pengguna dalam tabel
+def tampilkan_user(roles = [], status = [], kolom = ["No", "Username", "Role", "Status"]):
+    data = []
+    
+    # Memfilter data pengguna berdasarkan kolom yang diberikan 
+    for i, item in enumerate(data_user.load_data_user(roles, status)):
+        data.append({})
+        if "No" in kolom:
+            data[i]["No"] = i + 1
+        if "Username" in kolom:
+            data[i]["Username"] = item["username"]
+        if "Role" in kolom:
+            data[i]["Role"] = item["role"]
+        if "Status" in kolom:
+            data[i]["Status"] = item["status"]
+    
+    # Jika ada data, maka tampilkan tabel
+    if data:
+        dt = tabel(data)
+        print(dt)
+    else:
+        print()
+        print("Tidak ada data yang tersedia.")
+
+# Fungsi menampilkan form registrasi
+def form_register():
+    clear_screen()
+    try:
+        judul_halaman("Registrasi")
+        print("(Ket: Kosongkan input untuk kembali.)")
+        print()
+        input_username = input_string("Username (Maks 24 Huruf): ")
+
+        # Syarat yang harus dipenuhi input username untuk registrasi
+        if not input_username:
+            return
+        elif len(input_username) > 24:
+            raise ValueError("Username maksimal 24 karakter...!")
+        if any(user["username"].lower() == input_username.lower() for user in data_user.load_data_user()):
+            raise ValueError("Username sudah terdaftar!")
+        
+        while True:
+            input_password = input_fixed("Password (Maks 16 Huruf): ")
+
+            # Syarat yang harus dipenuhi input password untuk registrasi
+            if not input_password:
+                return
+            elif len(input_password) > 16:
+                print()
+                input("Password maksimal 16 karakter...!")
+                continue
+            break
+        
+        # Menambahkan data registrasi ke dalam database
+        registrasi_data = data_user.registrasi(input_username, input_password)
+        if registrasi_data.get("status"):
+            separator()
+            input(registrasi_data.get("message"))
+    except ValueError as e:
+        print()
+        input(e)
+        form_register()
+
+# Fungsi untuk menampilkan form login
+def form_login():
+    global username, halaman
+    clear_screen()
+    try:
+        judul_halaman("Log in")
+        print("(Ket: Kosongkan input untuk kembali.)")
+        print()
+        input_username = input("Username: ")
+        if not input_username:
+            return
+        input_password = input("Password: ")
+        if not input_password:
+            return
+        separator()
+        
+        # Melakukan autentikasi login
+        user_login_data = data_user.login(input_username, input_password)
+        input(user_login_data.get("message"))
+        if user_login_data.get("status"):
+            username = user_login_data["data"]["username"]
+
+            # Menagarahkan pengguna ke Halaman Menu Utama mereka masing-masing
+            halaman = "menu_utama"
+            if user_login_data["data"]["role"].lower() == data_user.role[0]:
+                menu_admin()
+            elif user_login_data["data"]["role"].lower() == data_user.role[1]:
+                menu_moderator()
+            else:
+                menu_user()
+    except Exception or KeyboardInterrupt:
+        return
+    
+# Fungsi untuk menampilkan form mengubah username akun yang digunakan
+def form_edit_username():
+    global username
+    try:
+        data = data_user.load_data_user()
+        self_index = data_user.cek_indeks(username)
+        used_user = data[self_index]
+
+        clear_screen()
+        judul_halaman("Ubah Username")
+        print("(Ket: Kosongkan input untuk kembali.)")
+        print()
+        input_username = input_string("Username (Maks 24 Huruf): ")
+
+        # Syarat yang harus dipenuhi untuk mengubah username
+        if not input_username:
+            return
+        elif len(input_username) > 24:
+            raise ValueError("Username maksimal 24 karakter...!")
+        elif any(user["username"] == input_username.lower() and username.lower() != input_username.lower() for user in data):
+            raise ValueError("Username sudah terdaftar...!")
+        
+        # Meminta konfirmasi
+        if dialog_konfirmasi(f"Yakin ingin mengubah username menjadi {input_username}?"):
+            edit_data = data_user.edit_user(self_index, input_username, used_user["password"], used_user["role"], used_user["status"])
+            username = input_username
+            separator()
+            if edit_data["status"]:
+                input("Berhasil mengubah username...!")
+            else:
+                input(edit_data["message"])
+    except Exception as e:
+        input(e)
+        form_edit_username()
+
+# Fungsi untuk menampilkan form mengubah password akun yang digunakan
+def form_edit_password():
+    global username
+    try:
+        data = data_user.load_data_user()
+        self_index = data_user.cek_indeks(username)
+        used_user = data[self_index]
+
+        clear_screen()
+        judul_halaman("Ubah Password")
+        print("(Ket: Kosongkan input untuk kembali.)")
+        print()
+
+        # Meminta konfirmasi password lama, untuk memastikan keamanan
+        konfirmasi_password = input_fixed("Konfirmasi Password\t\t: ")
+        if not konfirmasi_password:
+            return
+        elif konfirmasi_password != used_user["password"]:
+            raise ValueError("Password salah...!")
+
+        while True:
+            # Meminta password baru
+            input_password = input_fixed("Password (Maks 16 Huruf)\t: ")
+            if not input_password:
+                return
+            elif len(input_password) > 16:
+                print()
+                input("Password maksimal 16 karakter...!")
+                continue
+            break
+
+        # Meminta konfirmasi untuk mengubah password
+        if dialog_konfirmasi(f"Yakin ingin mengubah password?"):
+            edit_data = data_user.edit_user(self_index, used_user["username"], input_password, used_user["role"], used_user["status"])
+            separator()
+            if edit_data["status"]:
+                input("Berhasil mengubah password...!")
+            else:
+                input(edit_data["message"])
+        else:
+            input("Batal mengubah password...!")
+    except Exception as e:
+        print()
+        input(e)
+        form_edit_password()
+
+# Fungsi untuk menambahkan atau menghapus role "Moderator" pada pengguna
+def form_edit_moderator():
+    try:
+        # Mengambil data user dari database dan filter tabel untuk role "Moderator" dan "User", dengan status "Aktif"
+        data = data_user.load_data_user(roles, status)
+        roles = [data_user.role[1], data_user.role[2]]
+        status = [data_user.status[0]]
+
+        clear_screen()
+        judul_halaman("Moderator")
+        tampilkan_user(roles, status, kolom=["No", "Username", "Role"])        
+        print()
+        
+        # Jika ada data, maka akan menampilkan pilihan untuk mengubah status moderator
+        if data:
+            print("(Ket: Kosongkan input untuk kembali.)")
+
+            # Meminta nomor pengguna yang ingin diedit status moderatornya
+            indeks_user = input_fixed("Nomor Pengguna: ")
+
+            # Syarat yang harus dipenuhi untuk mengubah status role pengguna
+            if not indeks_user:
+                return
+            if not indeks_user.isdigit():
+                raise ValueError("Nomor pengguna harus berupa angka...!")
+            indeks_user = int(indeks_user) - 1
+
+            if indeks_user < 0 or indeks_user >= len(data):
+                raise IndexError("Pengguna tidak ditemukan...!")
+            user = data[indeks_user]
+            
+            # Menetapkan indeks pengguna yang akan diubah statusnya
+            global_indeks_user = data_user.cek_indeks(user["username"])
+        else:
+            input("Kembali ke menu...!")
+            return
+
+        # Jika status role pengguna adalah "User", maka akan dipromosikan menjadi "Moderator"
+        if user["role"] == data_user.role[2]:
+            if dialog_konfirmasi(f"Yakin ingin menambahkan {user["username"]} sebagai Moderator?"):
+                data_user.edit_user(global_indeks_user, user["username"], user["password"], data_user.role[1], user["status"])
+                input(f"Berhasil menambahkan Moderator...!")
+            else:
+                input("Batal menambahkan Moderator...!")
+        
+        # Jika status role pengguna sudah "Moderator", maka akan dikembalikan menjadi role "User"
+        elif user["role"] == data_user.role[1]:
+            if dialog_konfirmasi(f"Yakin ingin menghapus {user["username"]} sebagai Moderator?"):
+                data_user.edit_user(global_indeks_user, user["username"], user["password"], data_user.role[2], user["status"])
+                input(f"Berhasil menghapus Moderator...!")
+            else:
+                input("Batal menghapus Moderator...!")
+    except Exception as e:
+        print()
+        input(e)
+        form_edit_moderator()
+
+# Fungsi untuk mengubah status pemblokiran pengguna
+def form_edit_blokir():
+    try:
+        # Mengambil data user dari database dan filter tabel untuk role "Moderator" dan "User"
+        data = data_user.load_data_user(roles)
+        roles = [data_user.role[1], data_user.role[2]]
+
+        clear_screen()
+        judul_halaman("Blokir User")
+        tampilkan_user(roles, kolom=["No", "Username", "Status"])
+        print()
+
+        # Jika ada data, maka akan menampilkan pilihan untuk mengubah status blokir
+        if data:
+            # Meminta nomor pengguna yang ingin diblokir atau dibuka blokirnya
+            print("(Ket: Kosongkan input untuk kembali.)")
+            indeks_user = input("Nomor Pengguna: ")
+
+            # Syarat yang harus dipenuhi untuk mengubah status blokir pengguna
+            if indeks_user.strip():
+                if not indeks_user.isdigit():
+                    raise ValueError("Nomor pengguna harus berupa angka...!")
+                indeks_user = int(indeks_user) - 1
+
+                if indeks_user < 0 or indeks_user >= len(data):
+                    raise IndexError("Pengguna tidak ditemukan...!")
+                user = data[indeks_user]
+                global_indeks_user = data_user.cek_indeks(user["username"])
+            else:
+                return
+        else:
+            input("Kembali ke menu...!")
+            return
+        
+        # Jika status pengguna adalah "Aktif", maka akan diblokir
+        if user["status"] == data_user.status[0]:
+            if dialog_konfirmasi(f"Yakin ingin memblokir {user["username"]}?"):
+                data_user.edit_user(global_indeks_user, user["username"], user["password"], user["role"], data_user.status[1])
+                input(f"Berhasil memblokir pengguna...!")
+            else:
+                input("Batal memblokir pengguna...!")
+
+        # Jika status pengguna adalah "Blokir", maka akan dibuka blokirnya
+        elif user["status"] == data_user.status[1]:
+            if dialog_konfirmasi(f"Yakin ingin membuka blokir {user["username"]}?"):
+                data_user.edit_user(global_indeks_user, user["username"], user["password"], user["role"], data_user.status[0])
+                input(f"Berhasil membuka blokir pengguna...!")
+            else:
+                input("Batal membuka blokir pengguna...!")
+    except Exception as e:
+        print()
+        input(e)
+        form_edit_blokir()
+
+# End CRUD User
+# ------------------------------------------------------------
+# CRUD Tanaman
+    
 # Fungsi menampilkan data tanaman dalam bentuk tabel
 def tampilkan_tanaman(table_page = 1, limit = 5):
     data = data_tanaman.load_data_tanaman()
@@ -96,94 +386,6 @@ def tampilkan_satuan_waktu():
     for i, item in enumerate(data_tanaman.satuan_waktu, start=1):
         print(f"{i} > {item}")
     print()
-
-# Fungsi menampilkan username dan role pengguna dalam tabel
-def tampilkan_user(roles = [], status = [], kolom = ["No", "Username", "Role", "Status"]):
-    data = []
-    for i, item in enumerate(data_user.load_data_user(roles, status)):
-        data.append({})
-        if "No" in kolom:
-            data[i]["No"] = i + 1
-        if "Username" in kolom:
-            data[i]["Username"] = item["username"]
-        if "Role" in kolom:
-            data[i]["Role"] = item["role"]
-        if "Status" in kolom:
-            data[i]["Status"] = item["status"]
-    
-    if data:
-        dt = tabel(data)
-        print(dt)
-    else:
-        print()
-        print("Tidak ada data yang tersedia.")
-
-# ------------------------------------------------------------
-# Mini Menu Tampilan Form CRUD
-
-# Fungsi menampilkan form registrasi
-def form_register():
-    clear_screen()
-    try:
-        judul_halaman("Registrasi")
-        print("(Ket: Kosongkan input untuk kembali.)")
-        print()
-        input_username = input_string("Username (Maks 24 Huruf): ")
-
-        if not input_username:
-            return
-        elif len(input_username) > 24:
-            raise ValueError("Username maksimal 24 karakter...!")
-        if any(user["username"].lower() == input_username.lower() for user in data_user.load_data_user()):
-            raise ValueError("Username sudah terdaftar!")
-        
-        while True:
-            input_password = input_fixed("Password (Maks 16 Huruf): ")
-            if not input_password:
-                return
-            elif len(input_password) > 16:
-                print()
-                input("Password maksimal 16 karakter...!")
-                continue
-            break
-
-        registrasi_data = data_user.registrasi(input_username, input_password)
-        if registrasi_data.get("status"):
-            separator()
-            input(registrasi_data.get("message"))
-    except ValueError as e:
-        print()
-        input(e)
-        form_register()
-
-def form_login():
-    global username, halaman
-    clear_screen()
-    try:
-        judul_halaman("Log in")
-        print("(Ket: Kosongkan input untuk kembali.)")
-        print()
-        input_username = input("Username: ")
-        if not input_username:
-            return
-        input_password = input("Password: ")
-        if not input_password:
-            return
-        
-        user_login_data = data_user.login(input_username, input_password)
-        separator()
-        input(user_login_data.get("message"))
-        if user_login_data.get("status"):
-            username = user_login_data["data"]["username"]
-            halaman = "menu_utama"
-            if user_login_data["data"]["role"].lower() == data_user.role[0]:
-                menu_admin()
-            elif user_login_data["data"]["role"].lower() == data_user.role[1]:
-                menu_moderator()
-            else:
-                menu_user()
-    except Exception or KeyboardInterrupt:
-        return
 
 def form_tambah_tanaman():
     clear_screen()
@@ -464,171 +666,9 @@ def form_hapus_tanaman(table_page = 1):
     except Exception as e:
         input(e)
         return form_hapus_tanaman(table_page)
-
-def form_edit_username():
-    global username
-    try:
-        data = data_user.load_data_user()
-        self_index = data_user.cek_indeks(username)
-        used_user = data[self_index]
-
-        clear_screen()
-        judul_halaman("Ubah Username")
-        print("(Ket: Kosongkan input untuk kembali.)")
-        print()
-        input_username = input_string("Username (Maks 24 Huruf): ")
-        if not input_username:
-            return
-        elif len(input_username) > 24:
-            raise ValueError("Username maksimal 24 karakter...!")
-        elif any(user["username"] == input_username.lower() and username.lower() != input_username.lower() for user in data):
-            raise ValueError("Username sudah terdaftar...!")
-        
-        if dialog_konfirmasi(f"Yakin ingin mengubah username menjadi {input_username}?"):
-            edit_data = data_user.edit_user(self_index, input_username, used_user["password"], used_user["role"], used_user["status"])
-            username = input_username
-            separator()
-            if edit_data["status"]:
-                input("Berhasil mengubah username...!")
-            else:
-                input(edit_data["message"])
-    except Exception as e:
-        input(e)
-        form_edit_username()
-
-def form_edit_password():
-    global username
-    try:
-        data = data_user.load_data_user()
-        self_index = data_user.cek_indeks(username)
-        used_user = data[self_index]
-
-        clear_screen()
-        judul_halaman("Ubah Password")
-        print("(Ket: Kosongkan input untuk kembali.)")
-        print()
-        konfirmasi_password = input_fixed("Konfirmasi Password\t\t: ")
-        if not konfirmasi_password:
-            return
-        elif konfirmasi_password != used_user["password"]:
-            raise ValueError("Password salah...!")
-
-        while True:
-            input_password = input_fixed("Password (Maks 16 Huruf)\t: ")
-            if not input_password:
-                return
-            elif len(input_password) > 16:
-                print()
-                input("Password maksimal 16 karakter...!")
-                continue
-            break
-
-        if dialog_konfirmasi(f"Yakin ingin mengubah password?"):
-            edit_data = data_user.edit_user(self_index, used_user["username"], input_password, used_user["role"], used_user["status"])
-            separator()
-            if edit_data["status"]:
-                input("Berhasil mengubah password...!")
-            else:
-                input(edit_data["message"])
-        else:
-            input("Batal mengubah password...!")
-    except Exception as e:
-        print()
-        input(e)
-        form_edit_password()
-
-# Fungsi untuk menambahkan atau menghapus role "Moderator" pada pengguna
-def form_edit_moderator():
-    try:
-        clear_screen()
-        judul_halaman("Moderator")
-        roles = [data_user.role[1], data_user.role[2]]
-        status = [data_user.status[0]]
-        tampilkan_user(roles, status, kolom=["No", "Username", "Role"])        
-        data = data_user.load_data_user(roles, status)
-        print()
-        
-        if data:
-            print("(Ket: Kosongkan input untuk kembali.)")
-            indeks_user = input_fixed("Nomor Pengguna: ")
-            if not indeks_user:
-                return
-            if not indeks_user.isdigit():
-                raise ValueError("Nomor pengguna harus berupa angka...!")
-            indeks_user = int(indeks_user) - 1
-
-            if indeks_user < 0 or indeks_user >= len(data):
-                raise IndexError("Pengguna tidak ditemukan...!")
-            user = data[indeks_user]
-            
-            global_indeks_user = data_user.cek_indeks(user["username"])
-        else:
-            input("Kembali ke menu...!")
-            return
-
-        # Jika status role pengguna adalah "User", maka akan dipromosikan menjadi "Moderator"
-        if user["role"] == data_user.role[2]:
-            if dialog_konfirmasi(f"Yakin ingin menambahkan {user["username"]} sebagai Moderator?"):
-                data_user.edit_user(global_indeks_user, user["username"], user["password"], data_user.role[1], user["status"])
-                input(f"Berhasil menambahkan Moderator...!")
-            else:
-                input("Batal menambahkan Moderator...!")
-        
-        # Jika status role pengguna sudah "Moderator", maka akan dikembalikan menjadi role "User"
-        elif user["role"] == data_user.role[1]:
-            if dialog_konfirmasi(f"Yakin ingin menghapus {user["username"]} sebagai Moderator?"):
-                data_user.edit_user(global_indeks_user, user["username"], user["password"], data_user.role[2], user["status"])
-                input(f"Berhasil menghapus Moderator...!")
-            else:
-                input("Batal menghapus Moderator...!")
-    except Exception as e:
-        print()
-        input(e)
-        form_edit_moderator()
-
-def form_edit_blokir():
-    try:
-        clear_screen()
-        judul_halaman("Blokir User")
-        roles = [data_user.role[1], data_user.role[2]]
-        tampilkan_user(roles, kolom=["No", "Username", "Status"])
-        data = data_user.load_data_user(roles)
-        print()
-        if data:
-            print("(Ket: Kosongkan input untuk kembali.)")
-            indeks_user = input("Nomor Pengguna: ")
-        else:
-            input("Kembali ke menu...!")
-            return
-        
-        if indeks_user.strip():
-            if not indeks_user.isdigit():
-                raise ValueError("Nomor pengguna harus berupa angka...!")
-            indeks_user = int(indeks_user) - 1
-
-            if indeks_user < 0 or indeks_user >= len(data):
-                raise IndexError("Pengguna tidak ditemukan...!")
-            user = data[indeks_user]
-            global_indeks_user = data_user.cek_indeks(user["username"])
-        else:
-            return
-        
-        if user["status"] == data_user.status[0]:
-            if dialog_konfirmasi(f"Yakin ingin memblokir {user["username"]}?"):
-                data_user.edit_user(global_indeks_user, user["username"], user["password"], user["role"], data_user.status[1])
-                input(f"Berhasil memblokir pengguna...!")
-            else:
-                input("Batal memblokir pengguna...!")
-        elif user["status"] == data_user.status[1]:
-            if dialog_konfirmasi(f"Yakin ingin membuka blokir {user["username"]}?"):
-                data_user.edit_user(global_indeks_user, user["username"], user["password"], user["role"], data_user.status[0])
-                input(f"Berhasil membuka blokir pengguna...!")
-            else:
-                input("Batal membuka blokir pengguna...!")
-    except Exception as e:
-        print()
-        input(e)
-        form_edit_blokir()
+    
+# ------------------------------------------------------------
+# CRUD Diskusi
 
 def form_tambah_diskusi(indeks_tanaman):
     try:
@@ -663,74 +703,49 @@ def form_tambah_diskusi(indeks_tanaman):
         input(e)
         form_tambah_diskusi(indeks_tanaman)
         
-
+# End CRUD Diskusi
 # ------------------------------------------------------------
+# Menu Manajemen User
 
-def menu_utama():
+# Fungsi menampilkan halaman manajemen user
+def manajemen_user():
     global halaman, pilihan_menu
-    
-    judul_halaman("Menu Utama")
-    print("Selamat datang, " + username + "!")
+
+    judul_halaman("Manajemen User")
+    print("1 > Lihat User")
+    print("2 > Register User")
+    print("3 > Blokir User")
+    print("4 > Edit Moderator")
     print()
+    print("B > Kembali")
+    print("S > Pengaturan")
+    separator()
 
-    # Menu Utama Admin
-    if data_user.cek_admin(username):
-        print("1 > Dashboard")
-        print("2 > Manajemen Tanaman")
-        print("3 > Manajemen User")
+    pilihan_menu = input("Pilih Menu >> ").lower()
+    if pilihan_menu == "1":
+        clear_screen()
+        judul_halaman("Data User")
+        tampilkan_user()
         print()
-        print("S > Pengaturan")
-        separator()
-
-        pilihan_menu = input("Pilih Menu >> ").lower()
-        if pilihan_menu == "1":
-            clear_screen()
-            judul_halaman("Dashboard")
-            print("Jumlah Tanaman: " + str(len(data_tanaman.load_data_tanaman())))
-            print("Jumlah User: " + str(len(data_user.load_data_user())))
-            separator()
-            input("Kembali ke menu...")
-        elif pilihan_menu == "2":
-            halaman = "manajemen_tanaman"
-        elif pilihan_menu == "3":
-            halaman = "manajemen_user"
-        elif pilihan_menu == "s":
-            halaman = "pengaturan"
-        else:
-            input("Pilihan tidak valid, silakan coba lagi...")
-            pilihan_menu = ""
-    
-    # Menu Utama Moderator
-    elif data_user.cek_moderator(username):
-        print("1 > Manajemen Tanaman")
-        print()
-        print("S > Pengaturan")
-        separator()
-
-        pilihan_menu = input("Pilih Menu >> ").lower()
-        if pilihan_menu == "1":
-            halaman = "manajemen_tanaman"
-        elif pilihan_menu == "s":
-            halaman = "pengaturan"
-        else:
-            input("Pilihan tidak valid, silakan coba lagi...")
-            pilihan_menu = ""
-    
-    # Menu Utama User
+        input("Kembali ke menu...")
+    elif pilihan_menu == "2":
+        form_register()
+    elif pilihan_menu == "3":
+        form_edit_blokir()
+    elif pilihan_menu == "4":
+        form_edit_moderator()
+    elif pilihan_menu == "b":
+        kembali()
+    elif pilihan_menu == "s":
+        halaman = "pengaturan"
     else:
-        print("1 > Manajemen Tanaman")
         print()
-        print("S > Pengaturan")
-        separator()
+        input("Pilihan tidak valid, silakan coba lagi...")
+        pilihan_menu = ""
 
-        pilihan_menu = input("Pilih Menu >> ").lower()
-        if pilihan_menu == "1":
-            halaman = "manajemen_tanaman"
-        elif pilihan_menu == "s":
-            halaman = "pengaturan"
-        else:
-            input("Pilihan tidak valid, silakan coba lagi...")
-            pilihan_menu = ""
+# End CRUD Diskusi
+# ------------------------------------------------------------
+# Menu Manajemen Tanaman
 
 filter_tanaman = {}
 def manajemen_tanaman():
@@ -873,9 +888,18 @@ def menu_filter_tanaman():
                 print(f"{i} > {green_text if item in filter_tanaman.get('jenis', []) else ""}{item}{white_text}")
             separator()
             print("(Ket: Kosongkan input untuk kembali.)")
-            pilihan_menu = input_pilihan("Pilih Jenis Tanaman: ", range(1, len(data_tanaman.jenis) + 1))
+            pilihan_menu = input_fixed("Pilih Jenis Tanaman: ")
             if not pilihan_menu:
                 break
+            if not checkNumString(pilihan_menu):
+                print()
+                input("Input harus angka...!")
+                continue
+            pilihan_menu = int(pilihan_menu)
+            if pilihan_menu < 1 or pilihan_menu > len(data_tanaman.jenis):
+                print()
+                input("Pilihan tidak ada, silakan coba lagi...!")
+                continue
 
             filter_tanaman["jenis"] = [] if "jenis" not in filter_tanaman else filter_tanaman["jenis"]
             if data_tanaman.jenis[pilihan_menu - 1] in filter_tanaman["jenis"]:
@@ -921,9 +945,18 @@ def menu_filter_tanaman():
                 print(f"{i} > {green_text if item in filter_tanaman.get('media_tanam', []) else ""}{item}{white_text}")
             separator()
             print("(Ket: Kosongkan input untuk kembali.)")
-            pilihan_menu = input_pilihan("Pilih Media Tanam: ", range(1, len(data_tanaman.media_tanam) + 1))
+            pilihan_menu = input_fixed("Pilih Media Tanam: ")
             if not pilihan_menu:
                 break
+            if checkNumString(pilihan_menu):
+                print()
+                input("Input harus angka...!")
+                continue
+            pilihan_menu = int(pilihan_menu)
+            if pilihan_menu < 1 or pilihan_menu > len(data_tanaman.media_tanam):
+                print()
+                input("Pilihan tidak ada, silakan coba lagi...!")
+                continue    
 
             filter_tanaman["media_tanam"] = [] if "media_tanam" not in filter_tanaman else filter_tanaman["media_tanam"]
             if data_tanaman.media_tanam[pilihan_menu - 1] in filter_tanaman["media_tanam"]:
@@ -940,72 +973,6 @@ def menu_filter_tanaman():
         print()
         input("Pilihan tidak valid, silakan coba lagi...")
         menu_filter_tanaman()
-
-def manajemen_user():
-    global halaman, pilihan_menu
-
-    judul_halaman("Manajemen User")
-    print("1 > Lihat User")
-    print("2 > Register User")
-    print("3 > Blokir User")
-    print("4 > Edit Moderator")
-    print()
-    print("B > Kembali")
-    print("S > Pengaturan")
-    separator()
-
-    pilihan_menu = input("Pilih Menu >> ").lower()
-    if pilihan_menu == "1":
-        clear_screen()
-        judul_halaman("Data User")
-        tampilkan_user()
-        print()
-        input("Kembali ke menu...")
-    elif pilihan_menu == "2":
-        form_register()
-    elif pilihan_menu == "3":
-        form_edit_blokir()
-    elif pilihan_menu == "4":
-        form_edit_moderator()
-    elif pilihan_menu == "b":
-        kembali()
-    elif pilihan_menu == "s":
-        halaman = "pengaturan"
-    else:
-        print()
-        input("Pilihan tidak valid, silakan coba lagi...")
-        pilihan_menu = ""
-
-def menu_pengaturan():
-    global halaman, pilihan_menu, username
-
-    judul_halaman("Pengaturan")
-    print("1 > Ubah Username")
-    print("2 > Ubah Password")
-    print("3 > Log Out")
-    print()
-    print("B > Kembali")
-    print("N > Keluar")
-    separator()
-
-    pilihan_menu = input("Pilih Menu >> ").lower()
-    if pilihan_menu == "1":
-        clear_screen()
-        form_edit_username()
-    elif pilihan_menu == "2":
-        clear_screen()
-        form_edit_password()
-    elif pilihan_menu == "3":
-        print()
-        input("Berhasil Logout...!")
-        logout()
-    elif pilihan_menu == "b":
-        kembali()
-    elif pilihan_menu == "n":
-        logout()
-    else:
-        print()
-        input("Pilihan tidak valid, silakan coba lagi...")
 
 def detail_tanaman(indeks_tanaman):
     global halaman, pilihan_menu
@@ -1125,30 +1092,71 @@ def konten_diskusi(indeks_diskusi):
     else:
         input("Pilihan tidak valid, silakan coba lagi...")
 
+# End Menu Manajemen Tanaman
 # ------------------------------------------------------------
+# Menu Hak Akses
 
-def menu_awal():
-    clear_screen()
-    try:
-        global halaman, pilihan_menu, username
+# Halaman Menu Utama
+def menu_utama():
+    global halaman, pilihan_menu
+    
+    judul_halaman("Menu Utama")
+    print("Selamat datang, " + username + "!")
+    print()
 
-        judul_halaman("Menu Awal")
-        print("1 > Registrasi")
-        print("2 > Log in")
+    # Menu Utama Admin
+    if data_user.cek_admin(username):
+        print("1 > Dashboard")
+        print("2 > Manajemen Tanaman")
+        print("3 > Manajemen User")
         print()
-        print("N > Keluar Program")
+        print("S > Pengaturan")
         separator()
 
         pilihan_menu = input("Pilih Menu >> ").lower()
         if pilihan_menu == "1":
-            form_register()
+            dashboard()
         elif pilihan_menu == "2":
-            form_login()
-        elif pilihan_menu != "n":
-            print()
+            halaman = "manajemen_tanaman"
+        elif pilihan_menu == "3":
+            halaman = "manajemen_user"
+        elif pilihan_menu == "s":
+            halaman = "pengaturan"
+        else:
             input("Pilihan tidak valid, silakan coba lagi...")
-    except Exception or KeyboardInterrupt as e:
-        return
+            pilihan_menu = ""
+    
+    # Menu Utama Moderator
+    elif data_user.cek_moderator(username):
+        print("1 > Manajemen Tanaman")
+        print()
+        print("S > Pengaturan")
+        separator()
+
+        pilihan_menu = input("Pilih Menu >> ").lower()
+        if pilihan_menu == "1":
+            halaman = "manajemen_tanaman"
+        elif pilihan_menu == "s":
+            halaman = "pengaturan"
+        else:
+            input("Pilihan tidak valid, silakan coba lagi...")
+            pilihan_menu = ""
+    
+    # Menu Utama User
+    else:
+        print("1 > Manajemen Tanaman")
+        print()
+        print("S > Pengaturan")
+        separator()
+
+        pilihan_menu = input("Pilih Menu >> ").lower()
+        if pilihan_menu == "1":
+            halaman = "manajemen_tanaman"
+        elif pilihan_menu == "s":
+            halaman = "pengaturan"
+        else:
+            input("Pilihan tidak valid, silakan coba lagi...")
+            pilihan_menu = ""
 
 def menu_admin():
     global halaman, data_page_tanaman
@@ -1232,3 +1240,74 @@ def menu_user():
     except Exception or KeyboardInterrupt as e:
         input(e)
         menu_user()
+
+# Fungsi menampilkan dashboard (Admin)
+def dashboard():
+    clear_screen()
+    judul_halaman("Dashboard")
+    print("Jumlah Tanaman: " + str(len(data_tanaman.load_data_tanaman())))
+    print("Jumlah User: " + str(len(data_user.load_data_user())))
+    separator()
+    input("Kembali ke menu...")
+
+# Fungsi menampilkan halaman pengaturan
+def menu_pengaturan():
+    global halaman, pilihan_menu, username
+
+    judul_halaman("Pengaturan")
+    print("1 > Ubah Username")
+    print("2 > Ubah Password")
+    print("3 > Log Out")
+    print()
+    print("B > Kembali")
+    print("N > Keluar")
+    separator()
+
+    pilihan_menu = input("Pilih Menu >> ").lower()
+    if pilihan_menu == "1":
+        clear_screen()
+        form_edit_username()
+    elif pilihan_menu == "2":
+        clear_screen()
+        form_edit_password()
+    elif pilihan_menu == "3":
+        print()
+        input("Berhasil Logout...!")
+        logout()
+    elif pilihan_menu == "b":
+        kembali()
+    elif pilihan_menu == "n":
+        logout()
+    else:
+        print()
+        input("Pilihan tidak valid, silakan coba lagi...")
+
+# End Menu Hak Akses
+# ------------------------------------------------------------
+# Menu Awal
+
+# Fungsi menampilkan Menu Awal
+def menu_awal():
+    clear_screen()
+    try:
+        global halaman, pilihan_menu, username
+
+        judul_halaman("Menu Awal")
+        print("1 > Registrasi")
+        print("2 > Log in")
+        print()
+        print("N > Keluar Program")
+        separator()
+
+        pilihan_menu = input("Pilih Menu >> ").lower()
+        if pilihan_menu == "1":
+            form_register()
+        elif pilihan_menu == "2":
+            form_login()
+        elif pilihan_menu != "n":
+            print()
+            input("Pilihan tidak valid, silakan coba lagi...")
+    except Exception or KeyboardInterrupt as e:
+        return
+
+# End Menu Awal
