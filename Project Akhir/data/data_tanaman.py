@@ -35,6 +35,7 @@ media_tanam = (
 def load_data_tanaman(jenis_tanaman = [], min_suhu = "", max_suhu = "", media = []):
     data = load_data("data_tanaman.json")
     data_terfilter = []
+
     for tanaman in data:
         # Memfilter data tanaman berdasarkan jenis tanaman, suhu, dan media tanam
         if tanaman["jenis"] in jenis_tanaman if jenis_tanaman else True:
@@ -45,6 +46,7 @@ def load_data_tanaman(jenis_tanaman = [], min_suhu = "", max_suhu = "", media = 
                 data_terfilter.remove(tanaman)
             elif tanaman["media_tanam"] not in media if media else False:
                 data_terfilter.remove(tanaman)
+
     return data_terfilter
 
 # Fungsi untuk menyimpan data tanaman ke dalam file JSON dengan nama file "data_tanaman.json"
@@ -58,11 +60,15 @@ def tambah_tanaman(nama, jenis, jadwal_siram, min_suhu, max_suhu, pemupukan, med
             "status": False,
             "message": ""
         }
+        # Menduplikasi data tanaman dari database
+        data = load_data_tanaman()
 
+        # Syarat yang harus dipenuhi untuk menambahkan data tanaman
         if any(tanaman["nama"] == nama for tanaman in load_data_tanaman()):
             raise ValueError("Tanaman sudah ada...!")
 
-        databaru = {
+        # Menambahkan data tanaman baru pada duplikasi
+        data.append({
             "nama": nama,
             "jenis": jenis,
             "jadwal_siram": jadwal_siram,
@@ -70,13 +76,11 @@ def tambah_tanaman(nama, jenis, jadwal_siram, min_suhu, max_suhu, pemupukan, med
             "max_suhu": max_suhu,
             "pemupukan": pemupukan,
             "media_tanam": media_tanam
-        }
+        })
 
-        data = load_data_tanaman()
-        data.append(databaru)
+        # Menyimpan data tanaman baru ke dalam file JSON
         result["status"] = simpan_data_tanaman(data)
         result["message"] = "Tanaman berhasil ditambahkan...!"
-        return result
     except Exception as e:
         result["message"] = str(e)
     finally:
@@ -120,7 +124,6 @@ def edit_tanaman(indeks_tanaman: int, nama_baru, jenis_baru, jadwal_siram_baru, 
         # Menimpa data tanaman yang lama dengan duplikasi yang telah diubah
         result["status"] = simpan_data_tanaman(data)
         result["message"] = "Data berhasil diubah...!"
-        return result
     except IndexError or ValueError as e:
         result["message"] = str(e)
     finally:
@@ -145,7 +148,6 @@ def hapus_tanaman(indeks_tanaman: int):
         # Menimpa data tanaman yang lama dengan duplikasi yang telah diubah
         result["status"] = simpan_data_tanaman(data)
         result["message"] = "Tanaman berhasil dihapus...!"
-        return result
     except IndexError or ValueError as e:
         result["message"] = str(e)
     finally:

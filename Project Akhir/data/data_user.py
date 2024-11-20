@@ -9,6 +9,7 @@ status = ("aktif", "diblokir")
 def load_data_user(roles = [], status = []):
     data = load_data("data_user.json")
     data_terfilter = []
+
     for user in data:
         if user["role"] in roles if roles else True:
             data_terfilter.append(user)
@@ -23,50 +24,68 @@ def simpan_data_user(databaru):
 
 # Fungsi untuk melakukan login/autentikasi pengguna
 def login(username, password):
-    result = {
-        "data": None,
-        "status": False,
-        "message": ""
-    }
-    users = load_data_user()
-    
-    # Membuat perulangan pada setiap akun yang tersedia
-    for user in users:
-        # Membandingkan setiap akun dengan inputan username dan password
-        if user["username"] == username and user["password"] == password:
-            # Walaupun berhasil memasukkan data login, tetapi status akun diblokir, maka login gagal
-            if user["status"] == status[1]:
-                result["message"] = "Akun diblokir, silakan hubungi admin...!"
-                break
-            result["data"] = user
-            result["status"] = True
-            result["message"] = "Login berhasil...!"
-            break
-        else:
-            result["message"] = "Username atau password salah...!"
-    return result
+    try:
+        result = {
+            "data": None,
+            "status": False,
+            "message": ""
+        }
+        # Menduplikasi data pengguna dari database
+        users = load_data_user()
+        
+        # Membuat perulangan pada setiap akun yang tersedia
+        for user in users:
+            # Membandingkan setiap akun dengan input username dan password
+            if user["username"] == username and user["password"] == password:
+                # Jika berhasil, tetapi status akun diblokir, maka login gagal
+                if user["status"] == status[1]:
+                    raise ValueError("Akun diblokir, silakan hubungi admin...!")
+                
+                # Login berhasil
+                else:
+                    result["data"] = user
+                    result["status"] = True
+                    result["message"] = "Login berhasil...!"
+            else:
+                raise ValueError("Username atau password salah...!")
+    except Exception as e:
+        return str(e)
+    finally:
+        return result
 
 # Fungsi untuk melakukan registrasi pengguna
 def registrasi(username, password):
-    result = {
-        "status": False,
-        "message": ""
-    }
-    # Menduplikasi data pengguna dari database
-    users = load_data_user()
-    
-    # Menambahkan data baru pada duplikasi 
-    users.append({
-        "username" : username,
-        "password" : password,
-        "role" : role[2],
-        "status" : status[0]
-    })
-    
-    # Menimpa data pengguna yang lama dengan duplikasi yang baru
-    result["status"] = simpan_data_user(users)
-    result["message"] = "Registrasi berhasil...!"
-    return result
+    try:
+        result = {
+            "status": False,
+            "message": ""
+        }
+        # Menduplikasi data pengguna dari database
+        users = load_data_user()
+
+        # Beberapa syarat yang harus dipenuhi untuk melakukan registrasi
+        if any(user["username"] == username for user in users):
+            raise ValueError("Username sudah terdaftar...!")
+        elif not username.strip():
+            raise ValueError("Username tidak boleh kosong...!")
+        elif not password.strip():
+            raise ValueError("Password tidak boleh kosong...!")
+
+        # Menambahkan data baru pada duplikasi
+        users.append({
+            "username" : username,
+            "password" : password,
+            "role" : role[2],
+            "status" : status[0]
+        })
+
+        # Menimpa data pengguna yang lama dengan duplikasi yang baru
+        result["status"] = simpan_data_user(users)
+        result["message"] = "Registrasi berhasil...!"
+    except Exception as e:
+        result["message"] = str(e)
+    finally:
+        return result
 
 # Fungsi untuk mengubah data pengguna yang sudah terdaftar
 def edit_user(indeks_user, username_baru, password_baru, role_baru, status_baru):
