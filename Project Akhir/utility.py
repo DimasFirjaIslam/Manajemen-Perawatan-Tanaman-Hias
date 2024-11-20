@@ -36,7 +36,7 @@ def input_pilihan(prompt, pilihan):
                 if int(value_pilihan) in pilihan:
                     return int(value_pilihan)
                 else:
-                    raise ValueError("Pilihan tidak valid!")
+                    raise ValueError("Pilihan tidak ada!")
             else:
                 raise ValueError("Input harus angka!")
         return 0

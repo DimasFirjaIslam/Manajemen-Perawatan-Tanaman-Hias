@@ -59,24 +59,6 @@ def tambah_jawaban(indeks_diskusi: int, penulis, konten):
     result["message"] = "Jawaban berhasil ditambahkan...!"
     return result
 
-# Fungsi untuk mengubah diskusi yang dipilih
-def edit_jawaban():
-    try:
-        result = {
-            "status": False,
-            "message": ""
-        }
-        # Menduplikasi data diskusi dari database
-        data = load_data_diskusi()
-        
-        # Menampilkan data diskusi yang tersedia
-        result["status"] = simpan_data_diskusi(data)
-        result["message"] = "Data berhasil diubah...!"
-    except Exception as e:
-        result["message"] = str(e)
-    finally:
-        return result
-
 # Fungsi untuk menghapus diskusi dengan indeks yang dipilih
 def hapus_diskusi(indeks_diskusi: int):
     try:

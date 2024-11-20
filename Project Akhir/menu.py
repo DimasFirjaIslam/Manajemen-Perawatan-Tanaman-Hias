@@ -19,6 +19,7 @@ def cek_login():
 # Fungsi untuk logout (menghapus data login)
 def logout():
     global username, riwayatHalaman, halaman
+
     username = ""
     riwayatHalaman.clear()
     halaman = ""
@@ -26,6 +27,7 @@ def logout():
 # Fungsi untuk kembali ke halaman sebelumnya dengan riwayat halaman
 def kembali():
     global halaman
+    
     for i in range(2):
         if len(riwayatHalaman) > 0:
             halaman = riwayatHalaman.pop()
@@ -33,6 +35,7 @@ def kembali():
 # Fungsi yang selalu dilakukan saat halaman baru dibuka
 def setup_halaman():
     global halaman, riwayatHalaman
+    
     clear_screen()
     try:
         # Menambahkan halaman baru ke dalam riwayat halaman
@@ -111,15 +114,16 @@ def form_register():
 # Fungsi untuk menampilkan form login
 def form_login():
     global username, halaman
+
     clear_screen()
     try:
         judul_halaman("Log in")
         print("(Ket: Kosongkan input untuk kembali.)")
         print()
-        input_username = input("Username: ")
+        input_username = input_fixed("Username: ")
         if not input_username:
             return
-        input_password = input("Password: ")
+        input_password = input_fixed("Password: ")
         if not input_password:
             return
         separator()
@@ -127,10 +131,10 @@ def form_login():
         # Melakukan autentikasi login
         user_login_data = data_user.login(input_username, input_password)
         input(user_login_data.get("message"))
+
+        # Jika login berhasil, maka akan mengarahkan pengguna ke halaman menu utama
         if user_login_data.get("status"):
             username = user_login_data["data"]["username"]
-
-            # Menagarahkan pengguna ke Halaman Menu Utama mereka masing-masing
             halaman = "menu_utama"
             if user_login_data["data"]["role"].lower() == data_user.role[0]:
                 menu_admin()
@@ -952,8 +956,8 @@ def menu_filter_tanaman():
 
     # Memeriksa pilihan menu yang dipilih
     if pilihan_menu == "1":
+        # Filter jenis tanaman
         while True:
-            # Filter jenis tanaman
             clear_screen()
             judul_halaman("Filter Jenis Tanaman")
             for i, item in enumerate(data_tanaman.jenis, start=1):
@@ -989,8 +993,8 @@ def menu_filter_tanaman():
                 filter_tanaman["jenis"].append(data_tanaman.jenis[pilihan_menu - 1])
         menu_filter_tanaman()
     elif pilihan_menu == "2":
-        while True:
         # Filter suhu tanaman
+        while True:
             clear_screen()
             judul_halaman("Filter Suhu")
 
@@ -1031,8 +1035,8 @@ def menu_filter_tanaman():
             break
         menu_filter_tanaman()
     elif pilihan_menu == "3":
+        # Filter media tanam
         while True:
-            # Filter media tanam
             clear_screen()
             judul_halaman("Filter Media Tanam")
             for i, item in enumerate(data_tanaman.media_tanam, start=1):
@@ -1126,8 +1130,8 @@ def menu_diskusi(indeks_tanaman):
     global halaman, pilihan_menu
     
     list_tanaman = data_tanaman.load_data_tanaman()
-    list_diskusi = data_diskusi.load_data_diskusi([tanaman["nama"]])
     tanaman = list_tanaman[indeks_tanaman]
+    list_diskusi = data_diskusi.load_data_diskusi([tanaman["nama"]])
     nomor_diskusi_tersedia = {}
 
     clear_screen()
@@ -1185,8 +1189,11 @@ def konten_diskusi(indeks_diskusi):
     
     print("Respons:")
     if diskusi.get("jawaban"):
-        for jawaban in diskusi["jawaban"]:
-            print(f"> {jawaban["penulis"]}: {jawaban["konten"]}")
+        for i, jawaban in enumerate(diskusi["jawaban"], start=1):
+            if jawaban["penulis"] == username:
+                print(f"{i} > {jawaban['penulis']} (Anda): {jawaban['konten']}")
+            else:
+                print(f"{i} > {jawaban['penulis']}: {jawaban['konten']}")
     else:
         print("Belum ada jawaban...")
     print()
@@ -1204,13 +1211,26 @@ def konten_diskusi(indeks_diskusi):
     pilihan_menu = input("Pilih Menu >> ").lower()
 
     # Memeriksa pilihan menu yang dipilih
-    if pilihan_menu == "a" and (data_user.cek_admin(username) or data_user.cek_moderator(username)):
-        print()
+    if pilihan_menu.isdigit() and int(pilihan_menu) <= len(diskusi["jawaban"]):
+        separator()
+        if diskusi["jawaban"][int(pilihan_menu) - 1]["penulis"] == username or data_user.cek_admin(username):
+            print("Apakah Anda ingin menghapus jawaban ini?")
+            print()
+            if dialog_konfirmasi("Yakin ingin menghapus jawaban ini?"):
+                data_diskusi.hapus_jawaban(indeks_diskusi, int(pilihan_menu) - 1)
+                input("Berhasil menghapus jawaban...!")
+            else:
+                input("Batal menghapus jawaban...!")
+        else:
+            input("Anda tidak dapat menghapus jawaban orang lain...!")
+    elif pilihan_menu == "a" and (data_user.cek_admin(username) or data_user.cek_moderator(username)):
+        separator()
         jawab = input_string("Jawaban     : ")
         if not jawab:
             return
         data_diskusi.tambah_jawaban(indeks_diskusi, username, jawab)
     elif pilihan_menu == "d" and (data_user.cek_admin(username) or data_user.cek_moderator(username) or username == diskusi["penulis"]):
+        separator()
         if dialog_konfirmasi("Yakin ingin menghapus diskusi ini?"):
             data_diskusi.hapus_diskusi(indeks_diskusi)
             input("Berhasil menghapus diskusi...!")
@@ -1466,7 +1486,7 @@ def menu_awal():
         elif pilihan_menu != "n":
             print()
             input("Pilihan tidak valid, silakan coba lagi...")
-    except Exception or KeyboardInterrupt as e:
+    except Exception or KeyboardInterrupt:
         return
 
 # End Menu Awal

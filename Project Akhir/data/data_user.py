@@ -42,14 +42,15 @@ def login(username, password):
                     raise ValueError("Akun diblokir, silakan hubungi admin...!")
                 
                 # Login berhasil
-                else:
-                    result["data"] = user
-                    result["status"] = True
-                    result["message"] = "Login berhasil...!"
-            else:
-                raise ValueError("Username atau password salah...!")
+                result["data"] = user
+                result["status"] = True
+                result["message"] = "Login berhasil...!"
+                return result
+            
+        # Jika tidak ada akun yang sesuai dengan input, maka login gagal
+        raise ValueError("Username atau password salah...!")
     except Exception as e:
-        return str(e)
+        result["message"] = str(e)
     finally:
         return result
 
