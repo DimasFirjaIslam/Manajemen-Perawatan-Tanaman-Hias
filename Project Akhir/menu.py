@@ -76,6 +76,7 @@ def tampilkan_user(roles = [], status = [], kolom = ["No", "Username", "Role", "
 def form_register():
     clear_screen()
     try:
+        data = data_user.load_data_user()
         judul_halaman("Registrasi")
         print("(Ket: Kosongkan input untuk kembali.)")
         print()
@@ -86,7 +87,7 @@ def form_register():
             return
         elif len(input_username) > 24:
             raise ValueError("Username maksimal 24 karakter...!")
-        if any(user["username"].lower() == input_username.lower() for user in data_user.load_data_user()):
+        if any(user["username"].lower() == input_username.lower() for user in data):
             raise ValueError("Username sudah terdaftar!")
         
         while True:
@@ -230,9 +231,9 @@ def form_edit_password():
 def form_edit_moderator():
     try:
         # Mengambil data user dari database dan filter tabel untuk role "Moderator" dan "User", dengan status "Aktif"
-        data = data_user.load_data_user(roles, status)
         roles = [data_user.role[1], data_user.role[2]]
         status = [data_user.status[0]]
+        data = data_user.load_data_user(roles, status)
 
         clear_screen()
         judul_halaman("Moderator")
@@ -249,7 +250,7 @@ def form_edit_moderator():
             # Syarat yang harus dipenuhi untuk mengubah status role pengguna
             if not indeks_user:
                 return
-            if not indeks_user.isdigit():
+            if not checkNumString(indeks_user):
                 raise ValueError("Nomor pengguna harus berupa angka...!")
             indeks_user = int(indeks_user) - 1
 
@@ -262,21 +263,26 @@ def form_edit_moderator():
         else:
             input("Kembali ke menu...!")
             return
-
+        separator()
+        
         # Jika status role pengguna adalah "User", maka akan dipromosikan menjadi "Moderator"
         if user["role"] == data_user.role[2]:
             if dialog_konfirmasi(f"Yakin ingin menambahkan {user["username"]} sebagai Moderator?"):
                 data_user.edit_user(global_indeks_user, user["username"], user["password"], data_user.role[1], user["status"])
+                separator()
                 input(f"Berhasil menambahkan Moderator...!")
             else:
+                separator()
                 input("Batal menambahkan Moderator...!")
         
         # Jika status role pengguna sudah "Moderator", maka akan dikembalikan menjadi role "User"
         elif user["role"] == data_user.role[1]:
             if dialog_konfirmasi(f"Yakin ingin menghapus {user["username"]} sebagai Moderator?"):
                 data_user.edit_user(global_indeks_user, user["username"], user["password"], data_user.role[2], user["status"])
+                separator()
                 input(f"Berhasil menghapus Moderator...!")
             else:
+                separator()
                 input("Batal menghapus Moderator...!")
     except Exception as e:
         print()
@@ -287,8 +293,8 @@ def form_edit_moderator():
 def form_edit_blokir():
     try:
         # Mengambil data user dari database dan filter tabel untuk role "Moderator" dan "User"
-        data = data_user.load_data_user(roles)
         roles = [data_user.role[1], data_user.role[2]]
+        data = data_user.load_data_user(roles)
 
         clear_screen()
         judul_halaman("Blokir User")
@@ -303,7 +309,7 @@ def form_edit_blokir():
 
             # Syarat yang harus dipenuhi untuk mengubah status blokir pengguna
             if indeks_user.strip():
-                if not indeks_user.isdigit():
+                if not checkNumString(indeks_user):
                     raise ValueError("Nomor pengguna harus berupa angka...!")
                 indeks_user = int(indeks_user) - 1
 
@@ -319,10 +325,13 @@ def form_edit_blokir():
         
         # Jika status pengguna adalah "Aktif", maka akan diblokir
         if user["status"] == data_user.status[0]:
+            separator()
             if dialog_konfirmasi(f"Yakin ingin memblokir {user["username"]}?"):
                 data_user.edit_user(global_indeks_user, user["username"], user["password"], user["role"], data_user.status[1])
+                separator()
                 input(f"Berhasil memblokir pengguna...!")
             else:
+                separator()
                 input("Batal memblokir pengguna...!")
 
         # Jika status pengguna adalah "Blokir", maka akan dibuka blokirnya
@@ -431,7 +440,7 @@ def form_tambah_tanaman():
                 jadwal_siram = input_fixed(f"Lama Penyiraman ({satuan_waktu[satuan_siram - 1]})  \t: ")
                 if jadwal_siram == "":
                     return
-                elif not jadwal_siram.isdigit():
+                elif not checkNumString(jadwal_siram):
                     print()
                     input("Input harus angka...!")
                     continue
@@ -445,7 +454,7 @@ def form_tambah_tanaman():
         while True:
             min_suhu = input_fixed("Suhu Minimum (°C)\t\t: ")
             if min_suhu == "": return
-            elif not min_suhu.isdigit():
+            elif not checkNumString(min_suhu):
                 print()
                 input("Input harus angka...!")
                 continue
@@ -454,7 +463,7 @@ def form_tambah_tanaman():
             while True:
                 max_suhu = input_fixed("Suhu Maksimum (°C)\t\t: ")
                 if max_suhu == "": return
-                elif not max_suhu.isdigit():
+                elif not checkNumString(max_suhu):
                     print()
                     input("Input harus angka...!")
                     continue
@@ -475,7 +484,7 @@ def form_tambah_tanaman():
                 pemupukan = input_fixed(f"Lama Pemupukan ({satuan_waktu[satuan_pemupukan - 1]})\t\t: ")
                 if pemupukan == "":
                     return
-                elif not pemupukan.isdigit():
+                elif not checkNumString(pemupukan):
                     print()
                     input("Input harus angka...!")
                     continue
@@ -640,6 +649,7 @@ def form_edit_tanaman(table_page = 1):
         media_tanam = data_tanaman.media_tanam[pilihan_media - 1] if pilihan_media else tanaman_edit["media_tanam"]
 
         # Meminta konfirmasi perubahan tanaman di atas sudah benar
+        separator()
         if dialog_konfirmasi(f"Yakin ingin mengubah {tanaman_edit['nama']}?"):
             edit_data = data_tanaman.edit_tanaman(indeks_tersedia[pilihan_edit], nama, jenis, jadwal_siram, min_suhu, max_suhu, pemupukan, media_tanam)
         else:
@@ -724,12 +734,12 @@ def form_tambah_diskusi(indeks_tanaman):
         print()
         
         # Meminta input judul diskusi
-        judul = input_string("Judul (Maks 40 Huruf)\t: ")
+        judul = input_string("Judul (Maks 50 Huruf)\t: ")
         
         # Syarat penulisan judul yang harus dipenuhi untuk menambahkan diskusi
         if not judul:
             return
-        elif len(judul) > 40:
+        elif len(judul) > 50:
             raise ValueError("Judul diskusi maksimal 40 karakter...!")
         elif any(diskusi["judul"].lower() == judul.lower() and diskusi["tanaman"] == tanaman["nama"] for diskusi in list_diskusi):
             raise ValueError("Judul diskusi sudah ada, silakan melihat diskusi yang sudah ada...")
@@ -808,6 +818,7 @@ def manajemen_tanaman():
     total_halaman = int((len(data) - 1) / data_per_page) + 1
     nomor_indeks_tersedia = {}
 
+    clear_screen()
     judul_halaman("Manajemen Tanaman")
 
     # Menu Manajemen Tanaman Admin/Moderator
@@ -856,11 +867,9 @@ def manajemen_tanaman():
             halaman = f"detail_tanaman?{nomor_indeks_tersedia[pilihan_menu]}"
         elif pilihan_menu == "q" and data_page_tanaman > 1:
             data_page_tanaman -= 1
-            clear_screen()
             manajemen_tanaman()
         elif pilihan_menu == "e" and data_page_tanaman < total_halaman:
             data_page_tanaman += 1
-            clear_screen()
             manajemen_tanaman()
         elif pilihan_menu == "b":
             kembali()
@@ -1002,13 +1011,13 @@ def menu_filter_tanaman():
             min_suhu = input_fixed("Suhu Minimum (°C)\t: ")
 
             # Jika pilihan kosong, maka kembali ke menu filter tanaman
-            if not min_suhu.isdigit() and min_suhu != "":
+            if not checkNumString(min_suhu) and min_suhu != "":
                 print()
                 input("Input harus angka...!")
                 continue
 
             # Memeriksa apakah input suhu minimum adalah angka
-            if min_suhu.isdigit():
+            if checkNumString(min_suhu):
                 min_suhu = float(min_suhu)
             
             while True:
@@ -1016,7 +1025,7 @@ def menu_filter_tanaman():
                 max_suhu = input_fixed("Suhu Maksimum (°C)\t: ")
 
                 # Jika pilihan kosong, maka kembali ke menu filter tanaman
-                if not max_suhu.isdigit() and max_suhu != "":
+                if not checkNumString(max_suhu) and max_suhu != "":
                     print()
                     input("Input harus angka...!")
                     continue
@@ -1052,7 +1061,7 @@ def menu_filter_tanaman():
                 break
 
             # Memeriksa apakah pilihan adalah angka
-            if checkNumString(pilihan_menu):
+            if not checkNumString(pilihan_menu):
                 print()
                 input("Input harus angka...!")
                 continue
@@ -1202,7 +1211,7 @@ def konten_diskusi(indeks_diskusi):
     if data_user.cek_admin(username) or data_user.cek_moderator(username):
         print("A > Jawab")
     if data_user.cek_admin(username) or data_user.cek_moderator(username) or username == diskusi["penulis"]:
-        print("D > Hapus Diskusi Ini")
+        print("D > Hapus Diskusi")
     print("B > Kembali")
     print("S > Pengaturan")
     separator()
@@ -1211,7 +1220,7 @@ def konten_diskusi(indeks_diskusi):
     pilihan_menu = input("Pilih Menu >> ").lower()
 
     # Memeriksa pilihan menu yang dipilih
-    if pilihan_menu.isdigit() and int(pilihan_menu) <= len(diskusi["jawaban"]):
+    if checkNumString(pilihan_menu) and int(pilihan_menu) <= len(diskusi["jawaban"]):
         separator()
         if diskusi["jawaban"][int(pilihan_menu) - 1]["penulis"] == username or data_user.cek_admin(username):
             print("Apakah Anda ingin menghapus jawaban ini?")

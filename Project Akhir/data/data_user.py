@@ -15,10 +15,9 @@ def load_data_user(roles = [], status = []):
             data_terfilter.append(user)
         if user["status"] not in status if status else False:
             data_terfilter.remove(user)
-        
     return data_terfilter
 
-# Fungsi untuk menyimpan data pengguna ke dalam file JSON dengan nama file "data_user.json"
+# Fungsi untuk menyimpan data baru pengguna ke dalam file JSON dengan nama file "data_user.json"
 def simpan_data_user(databaru):
     return simpan_data(databaru, "data_user.json")
 
@@ -30,15 +29,11 @@ def login(username, password):
             "status": False,
             "message": ""
         }
-        # Menduplikasi data pengguna dari database
-        users = load_data_user()
+        users = load_data_user() # Menduplikasi data pengguna dari database
         
-        # Membuat perulangan pada setiap akun yang tersedia
         for user in users:
-            # Membandingkan setiap akun dengan input username dan password
-            if user["username"] == username and user["password"] == password:
-                # Jika berhasil, tetapi status akun diblokir, maka login gagal
-                if user["status"] == status[1]:
+            if user["username"] == username and user["password"] == password: # Mencocokkan username/password akun dengan input
+                if user["status"] == status[1]: # Jika berhasil, tetapi status akun diblokir, maka login gagal
                     raise ValueError("Akun diblokir, silakan hubungi admin...!")
                 
                 # Login berhasil
@@ -61,8 +56,7 @@ def registrasi(username, password):
             "status": False,
             "message": ""
         }
-        # Menduplikasi data pengguna dari database
-        users = load_data_user()
+        users = load_data_user() # Menduplikasi data pengguna dari database
 
         # Beberapa syarat yang harus dipenuhi untuk melakukan registrasi
         if any(user["username"] == username for user in users):

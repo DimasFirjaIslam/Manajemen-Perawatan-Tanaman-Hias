@@ -18,15 +18,21 @@
         "status": "aktif"
     },
     {
-        "username": "user",
-        "password": "user",
-        "role": "user",
+        "username": "admin",
+        "password": "admin123",
+        "role": "admin",
         "status": "aktif"
     },
     {
-        "username": "mod",
-        "password": "mod",
+        "username": "moderator",
+        "password": "moderator123",
         "role": "moderator",
+        "status": "aktif"
+    },
+    {
+        "username": "user",
+        "password": "user",
+        "role": "user",
         "status": "aktif"
     },
     {
@@ -44,7 +50,7 @@
     {
         "username": "Remptyh",
         "password": "Determination",
-        "role": "user",
+        "role": "moderator",
         "status": "aktif"
     },
     {
@@ -58,5 +64,11 @@
         "password": "userbaru123",
         "role": "user",
         "status": "aktif"
+    },
+    {
+        "username": "Budi",
+        "password": "budi2006",
+        "role": "user",
+        "status": "diblokir"
     }
 ]

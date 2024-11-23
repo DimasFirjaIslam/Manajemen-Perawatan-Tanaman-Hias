@@ -6,8 +6,8 @@ jenis = (
     "Bonsai Bunga",
     "Tropis",
     "Tropis Merambat",
-    "Tropis Berdaun Besar",
     "Sukulen",
+    "Tropis Berdaun Besar",
     "Tanaman Paku",
     "Hias Berdaun Warna",
     "Tanaman Semak",
@@ -18,7 +18,7 @@ satuan_waktu = (
     "Hari",
     "Minggu",
     "Bulan",
-    "Tahun",
+    "Tahun"
 )
 
 media_tanam = (
@@ -28,7 +28,7 @@ media_tanam = (
     "Tanah Humus",
     "Tanah Subur",
     "Tanah Subur dan Berpasir",
-    "Tambus Gambut",
+    "Tambus Gambut"
 )
 
 # Fungsi untuk mengambil data tanaman dari file JSON dengan nama file "data_tanaman.json"

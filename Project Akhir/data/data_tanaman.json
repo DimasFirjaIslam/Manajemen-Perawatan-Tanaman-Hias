@@ -45,15 +45,6 @@
         "media_tanam": "Tanah Humus"
     },
     {
-        "nama": "Sri Rejeki",
-        "jenis": "Tropis",
-        "jadwal_siram": "2 Hari Sekali",
-        "min_suhu": 20.0,
-        "max_suhu": 30.0,
-        "pemupukan": "1 Bulan Sekali",
-        "media_tanam": "Tanah Subur"
-    },
-    {
         "nama": "Daun Puring",
         "jenis": "Hias Berdaun Warna",
         "jadwal_siram": "2 Hari Sekali",
@@ -135,30 +126,12 @@
         "media_tanam": "Tanah Berpasir"
     },
     {
-        "nama": "Aglaonema",
-        "jenis": "Tropis",
-        "jadwal_siram": "3 Hari Sekali",
-        "min_suhu": 20.0,
-        "max_suhu": 30.0,
-        "pemupukan": "1 Bulan Sekali",
-        "media_tanam": "Tanah Subur"
-    },
-    {
-        "nama": "Tanaman Baru",
+        "nama": "Sri Rejeki",
         "jenis": "Tropis Merambat",
-        "jadwal_siram": "3 Minggu Sekali",
-        "min_suhu": 20.0,
-        "max_suhu": 25.0,
+        "jadwal_siram": "1 Minggu Sekali",
+        "min_suhu": 23.0,
+        "max_suhu": 28.0,
         "pemupukan": "2 Bulan Sekali",
-        "media_tanam": "Tanah Berpasir"
-    },
-    {
-        "nama": "Kipli",
-        "jenis": "Tropis",
-        "jadwal_siram": "3 Minggu Sekali",
-        "min_suhu": 4.0,
-        "max_suhu": 5.0,
-        "pemupukan": "1 Minggu Sekali",
-        "media_tanam": "Tanah Humus"
+        "media_tanam": "Tanah Subur dan Berpasir"
     }
 ]

@@ -1,121 +1,99 @@
 [
     {
-        "judul": "Diskusi 1",
+        "judul": "Meletakkan Monstera di dalam kamar",
         "tanaman": "Monstera",
-        "tanggal": "10-11-2024",
         "penulis": "user",
-        "konten": "Apakah Monstera bisa diletakkan di dalam kamar?",
-        "jawaban": [
-            {
-                "penulis": "moderator",
-                "konten": "Monstera bisa diletakkan di dalam kamar asal mendapat cahaya matahari yang cukup."
-            }
-        ]
-    },
-    {
-        "judul": "Diskusi 2",
-        "tanaman": "Calathea",
-        "tanggal": "12-11-2024 15:30",
-        "penulis": "user",
-        "konten": "Bagaimana cara merawat Calathea?",
-        "jawaban": [
-            {
-                "penulis": "moderator",
-                "konten": "Calathea memerlukan sinar matahari yang tidak langsung dan tanah yang lembab."
-            }
-        ]
-    },
-    {
-        "judul": "Diskusi 3",
-        "tanaman": "Aglaonema",
-        "tanggal": "13-11-2024 10:46",
-        "penulis": "user",
-        "konten": "Apakah Aglaonema bisa diletakkan di dalam kamar?",
-        "jawaban": [
-            {
-                "penulis": "moderator",
-                "konten": "Aglaonema bisa diletakkan di dalam kamar asal mendapat cahaya matahari yang cukup."
-            }
-        ]
-    },
-    {
-        "judul": "Halo",
-        "tanaman": "Bunga Kamboja",
-        "penulis": "MTHermawan",
-        "konten": "Dunia",
+        "konten": "Saya ingin menanam Monstera di dalam kamar saya. Apakah Monstera bisa diletakkan di dalam kamar? Apakah Monstera memerlukan cahaya matahari langsung?",
         "tanggal": "13-11-2024 17:29",
         "jawaban": [
             {
                 "penulis": "MTHermawan",
-                "konten": "idk",
+                "konten": "Monstera bisa diletakkan di dalam kamar, namun memerlukan cahaya matahari yang cukup.",
                 "tanggal": "13-11-2024 19:20:57"
-            },
-            {
-                "penulis": "MTHermawan",
-                "konten": "p",
-                "tanggal": "13-11-2024 19:21:56"
             }
         ]
     },
     {
-        "judul": "tes",
-        "tanaman": "Bunga Kamboja",
-        "penulis": "MTHermawan",
-        "konten": "tes",
+        "judul": "Pemupukan Aglaonema",
+        "tanaman": "Sri Rejeki",
+        "penulis": "user",
+        "konten": "Kapan waktu yang tepat untuk memupuk Aglaonema?",
         "tanggal": "13-11-2024 20:02",
         "jawaban": [
             {
                 "penulis": "MTHermawan",
-                "konten": "tes",
-                "tanggal": "13-11-2024 20:02:30"
-            },
-            {
-                "penulis": "MTHermawan",
-                "konten": "Yo ndak tahu",
-                "tanggal": "13-11-2024 20:03:51"
-            },
-            {
-                "penulis": "user",
-                "konten": "tes",
-                "tanggal": "14-11-2024 20:27:55"
+                "konten": "Pemupukan Aglaonema dilakukan 1 bulan sekali.",
+                "tanggal": "13-11-2024 20:23:35"
             }
         ]
     },
     {
-        "judul": "gk tahu",
-        "tanaman": "Bunga Kamboja",
-        "penulis": "MTHermawan",
-        "konten": "gk tahu juga",
-        "tanggal": "13-11-2024 20:04",
+        "judul": "Media Tanam untuk Calathea",
+        "tanaman": "Calathea",
+        "penulis": "HackerTzy",
+        "konten": "Apakah Calathea bisa ditanam di tanah berpasir?",
+        "tanggal": "13-11-2024 20:15",
         "jawaban": [
             {
                 "penulis": "MTHermawan",
-                "konten": "Halo",
-                "tanggal": "21-11-2024 03:42:33"
+                "konten": "Calathea bisa ditanam di tanah berpasir.",
+                "tanggal": "13-11-2024 21:24:12"
             }
         ]
     },
     {
-        "judul": "Bagaimana cara saya blablabla",
-        "tanaman": "Tanaman Baru",
-        "penulis": "MTHermawan",
-        "konten": "ini deskripsi permasalahannya",
-        "tanggal": "14-11-2024 21:11",
+        "judul": "Pemupukan Kadaka",
+        "tanaman": "Kadaka",
+        "penulis": "user",
+        "konten": "Kapan waktu yang tepat untuk memupuk Kadaka?",
+        "tanggal": "14-11-2024 19:30",
         "jawaban": [
             {
                 "penulis": "MTHermawan",
-                "konten": "Harus gini2",
-                "tanggal": "14-11-2024 21:11:17"
-            },
+                "konten": "Pemupukan Kadaka dilakukan 1 bulan sekali.",
+                "tanggal": "14-11-2024 20:23:35"
+            }
+        ]
+    },
+    {
+        "judul": "Pemupukan Daun Dollar",
+        "tanaman": "Daun Dollar",
+        "penulis": "user",
+        "konten": "Kapan waktu yang tepat untuk memupuk Daun Dollar?",
+        "tanggal": "14-11-2024 17:23",
+        "jawaban": [
             {
-                "penulis": "user",
-                "konten": "Jawaban lain",
-                "tanggal": "14-11-2024 21:35:48"
-            },
+                "penulis": "MTHermawan",
+                "konten": "Pemupukan Daun Dollar dilakukan 3 bulan sekali.",
+                "tanggal": "14-11-2024 20:56:49"
+            }
+        ]
+    },
+    {
+        "judul": "Pemupukan Begonia",
+        "tanaman": "Begonia",
+        "penulis": "user",
+        "konten": "Kapan waktu yang tepat untuk memupuk Begonia?",
+        "tanggal": "14-11-2024 19:30",
+        "jawaban": [
             {
-                "penulis": "mod",
-                "konten": "Tes",
-                "tanggal": "14-11-2024 21:40:47"
+                "penulis": "MTHermawan",
+                "konten": "Pemupukan Begonia dilakukan 2 minggu sekali.",
+                "tanggal": "14-11-2024 20:12:43"
+            }
+        ]
+    },
+    {
+        "judul": "Tempat yang cocok untuk menaruh Sri Rejeki",
+        "tanaman": "Sri Rejeki",
+        "penulis": "user",
+        "konten": "Halo, saya ingin menanam Sri Rejeki. Apakah Sri Rejeki bisa diletakkan dalam ruangan seperti kamar?",
+        "tanggal": "22-11-2024 19:29",
+        "jawaban": [
+            {
+                "penulis": "admin",
+                "konten": "Sri Rejeki bisa diletakkan di dalam ruangan seperti kamar.",
+                "tanggal": "22-11-2024 19:41:05"
             }
         ]
     }
